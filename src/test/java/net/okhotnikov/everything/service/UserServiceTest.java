@@ -16,6 +16,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -86,6 +90,13 @@ public class UserServiceTest {
         assertNull(userService.get(TEST_USER_NAME));
     }
 
+    @Test
+    public void getNewUsers() throws IOException {
+        LocalDate date = LocalDate.now();
+
+        List<User> res = userService.getAfter(date.minus(7, ChronoUnit.DAYS));
+        System.out.println(res);
+    }
 
 
     @Test

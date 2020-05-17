@@ -66,6 +66,7 @@ public class User extends UserRecord implements UserDetails {
         return registered;
     }
 
+
     public void setRegistered(LocalDate registered) {
         this.registered = registered;
     }

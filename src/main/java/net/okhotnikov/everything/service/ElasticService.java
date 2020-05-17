@@ -2,6 +2,7 @@ package net.okhotnikov.everything.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.okhotnikov.everything.dao.ElasticDao;
 import net.okhotnikov.everything.util.DataUtil;
 import org.elasticsearch.action.search.SearchResponse;
@@ -65,7 +66,7 @@ public class ElasticService {
 
         return res
                 .stream()
-                .map(val -> mapper.convertValue(value, typeReference))
+                .map(val -> mapper.convertValue(val, typeReference))
                 .collect(Collectors.toList());
     }
 
