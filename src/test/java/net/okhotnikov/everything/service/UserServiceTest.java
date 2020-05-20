@@ -5,9 +5,7 @@ import static org.junit.Assert.assertNotEquals;
 
 import net.okhotnikov.everything.api.TokenResponse;
 import net.okhotnikov.everything.dao.RedisDao;
-import net.okhotnikov.everything.model.Role;
 import net.okhotnikov.everything.model.User;
-import net.okhotnikov.everything.model.UserRecord;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +16,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Sergey Okhotnikov.
@@ -78,9 +75,9 @@ public class UserServiceTest {
         redisDao.delKey(newTokens.token);
         redisDao.delKey(newTokens.refreshToken);
 
-//        userService.delete(TEST_USER_NAME);
-//
-//        assertNull(userService.get(TEST_USER_NAME));
+        userService.delete(TEST_USER_NAME);
+
+        assertNull(userService.get(TEST_USER_NAME));
     }
 
     @Test
@@ -92,10 +89,24 @@ public class UserServiceTest {
 
     @Test
     public void getNewUsers() throws IOException {
+        User user = new User(TEST_USER_NAME,TEST_PASSWORD,new HashSet<>(),true);
         LocalDate date = LocalDate.now();
 
-        List<User> res = userService.getAfter(date.minus(7, ChronoUnit.DAYS));
-        System.out.println(res);
+        user.registered = date.plus(1, ChronoUnit.DAYS);
+
+        userService.create(user);
+
+        List<User> res = userService.getAfter(date);
+
+        assertEquals(1,res.size());
+
+        String newToken = userService.updateReader();
+
+        assertEquals(newToken, userService.getReadersToken());
+
+        userService.delete(TEST_USER_NAME);
+
+        assertNull(userService.get(TEST_USER_NAME));
     }
 
 

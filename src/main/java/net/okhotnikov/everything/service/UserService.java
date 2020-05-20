@@ -10,6 +10,8 @@ import net.okhotnikov.everything.exceptions.DuplicatedKeyException;
 import net.okhotnikov.everything.exceptions.UnauthorizedException;
 import net.okhotnikov.everything.model.TokenType;
 import net.okhotnikov.everything.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import javax.validation.constraints.Email;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,12 +42,16 @@ public class UserService implements UserDetailsService {
     private final RedisService redisService;
     private final RedisDao redisDao;
     private final EmailService emailService;
+    private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
 
     @Value("${reader.password}")
     private String readerPassword;
 
     @Value("${reader.username}")
     private String readerUsername;
+
+    @Value("${reader.trial}")
+    private int trialPeriod;
 
 
     public UserService(ElasticService elasticService, ElasticDao dao, ObjectMapper mapper, PasswordEncoder passwordEncoder, RedisService redisService, RedisDao redisDao, EmailService emailService) {
@@ -173,6 +180,23 @@ public class UserService implements UserDetailsService {
 
     public TokenResponse loginReader() throws IOException {
         return login(readerUsername, readerPassword, TokenType.ACCESS_CODE);
+    }
+
+    public String updateReader() throws IOException{
+        TokenResponse tokenResponse = loginReader();
+        LocalDate date = LocalDate.now();
+
+        List<User> res = getAfter(date.minus(trialPeriod, ChronoUnit.DAYS));
+        for(User user: res){
+            try {
+
+                emailService.send(user.username,tokenResponse.token);
+
+            }catch (Exception e){
+                LOG.error((user == null? "null" : user.username) +" -> "+e.getClass().getSimpleName());
+            }
+        }
+        return tokenResponse.token;
     }
 
     public String getReadersToken() throws IOException {
