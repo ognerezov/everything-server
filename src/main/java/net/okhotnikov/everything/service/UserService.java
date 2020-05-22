@@ -2,8 +2,8 @@ package net.okhotnikov.everything.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.okhotnikov.everything.api.RegisterResponse;
-import net.okhotnikov.everything.api.TokenResponse;
+import net.okhotnikov.everything.api.out.RegisterResponse;
+import net.okhotnikov.everything.api.out.TokenResponse;
 import net.okhotnikov.everything.dao.ElasticDao;
 import net.okhotnikov.everything.dao.RedisDao;
 import net.okhotnikov.everything.exceptions.DuplicatedKeyException;

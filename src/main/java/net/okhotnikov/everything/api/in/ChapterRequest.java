@@ -1,4 +1,4 @@
-package net.okhotnikov.everything.api;
+package net.okhotnikov.everything.api.in;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashSet;

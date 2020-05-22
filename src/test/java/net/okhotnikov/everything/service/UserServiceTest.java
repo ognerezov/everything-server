@@ -3,7 +3,7 @@ package net.okhotnikov.everything.service;
 import static junit.framework.Assert.*;
 import static org.junit.Assert.assertNotEquals;
 
-import net.okhotnikov.everything.api.TokenResponse;
+import net.okhotnikov.everything.api.out.TokenResponse;
 import net.okhotnikov.everything.dao.RedisDao;
 import net.okhotnikov.everything.model.User;
 import org.junit.Test;

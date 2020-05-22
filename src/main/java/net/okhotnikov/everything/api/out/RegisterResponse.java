@@ -1,4 +1,4 @@
-package net.okhotnikov.everything.api;
+package net.okhotnikov.everything.api.out;
 
 /**
  * Created by Sergey Okhotnikov.

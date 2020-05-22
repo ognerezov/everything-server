@@ -1,6 +1,6 @@
 package net.okhotnikov.everything.web;
 
-import net.okhotnikov.everything.api.ChapterRequest;
+import net.okhotnikov.everything.api.in.ChapterRequest;
 import net.okhotnikov.everything.service.ElasticService;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,11 +36,6 @@ public class BookController {
     @GetMapping("/count")
     public long count () throws IOException {
         return elasticService.countChapters();
-    }
-
-    @GetMapping("/quotations")
-    public List<Map<String, Object>> getQuotations() throws IOException {
-        return elasticService.getQuotations();
     }
 
     @GetMapping("/rules")
