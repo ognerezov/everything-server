@@ -7,16 +7,14 @@ import net.okhotnikov.everything.exceptions.rejection.Rejection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -25,29 +23,20 @@ import java.io.IOException;
  * Created by Sergey Okhotnikov.
  */
 @Configuration
-public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
+public class TokenAuthenticationFilter implements Filter {
 
     public static final String AUTHORIZATION = "Authorization";
     private final TokenAuthenticationProvider tokenAuthenticationProvider;
     private final ObjectMapper mapper;
 
     protected TokenAuthenticationFilter(TokenAuthenticationProvider tokenAuthenticationProvider, ObjectMapper mapper) {
-        super("/**");
         this.mapper = mapper;
-
-        setAuthenticationSuccessHandler((request, response, authentication) ->
-        {
-            SecurityContextHolder.getContext().setAuthentication(authentication);
- //           request.getRequestDispatcher(request.getServletPath() ).forward(request, response);
-        });
-        setAuthenticationFailureHandler((request, response, authenticationException) -> {
-            returnUnauthorizedResponse(response, authenticationException.getMessage());
-        });
         this.tokenAuthenticationProvider = tokenAuthenticationProvider;
     }
 
     private void returnUnauthorizedResponse(HttpServletResponse response, String message) throws IOException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        response.setContentType(MediaType.APPLICATION_JSON.toString());
         response.getOutputStream().print(message);
     }
 
@@ -92,25 +81,10 @@ public class TokenAuthenticationFilter extends AbstractAuthenticationProcessingF
                                 ,mapper,""
                         ));
             }
-
         }
-           // super.doFilter(req, res,chain);
-    }
-
-
-    @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse httpServletResponse) throws AuthenticationException, IOException, ServletException {
-        String token = getToken(request);
-        return tokenAuthenticationProvider.authenticate(new TokenAuthentication(token));
     }
 
     private String getToken(HttpServletRequest request) {
         return request.getHeader(AUTHORIZATION);
-    }
-
-    @Autowired
-    @Override
-    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
-        super.setAuthenticationManager(authenticationManager);
     }
 }
