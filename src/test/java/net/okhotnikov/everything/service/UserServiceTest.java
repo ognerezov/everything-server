@@ -108,10 +108,21 @@ public class UserServiceTest {
 
         assertNull(userService.get(TEST_USER_NAME));
     }
-
+    @Test
+    public void printToken() throws IOException {
+        System.out.println(userService.getReadersToken());
+    }
 
     @Test
-    public void getReader() throws IOException {
+    public void registerTestUser() throws IOException {
+
+        userService.register(TEST_USER_NAME,TEST_PASSWORD);
+
+        System.out.println(userService.get(TEST_USER_NAME));
+    }
+
+    @Test
+    public void processReader() throws IOException {
         User user = userService.get(userService.getReaderUsername());
         assertNotNull(user);
 

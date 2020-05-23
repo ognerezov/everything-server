@@ -86,7 +86,7 @@ public class RedisService {
     public TokenResponse refresh(String refreshToken, TokenType tokenType){
         User user = auth(refreshToken);
         if(user == null)
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(refreshToken);
 
         dao.delKey(refreshToken);
         dao.delKey(user.token);

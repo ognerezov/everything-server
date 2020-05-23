@@ -2,13 +2,11 @@ package net.okhotnikov.everything.config;
 
 import net.okhotnikov.everything.config.authentication.TokenAuthenticationFilter;
 import net.okhotnikov.everything.config.authentication.TokenAuthenticationProvider;
-import net.okhotnikov.everything.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -22,13 +20,9 @@ import org.springframework.security.web.firewall.HttpFirewall;
 @EnableWebSecurity
 public class SecurityConfig  extends WebSecurityConfigurerAdapter {
 
-    private final TokenAuthenticationProvider tokenAuthenticationProvider;
-
-
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
-    public SecurityConfig(TokenAuthenticationProvider tokenAuthenticationProvider, TokenAuthenticationFilter tokenAuthenticationFilter) {
-        this.tokenAuthenticationProvider = tokenAuthenticationProvider;
+    public SecurityConfig(TokenAuthenticationFilter tokenAuthenticationFilter) {
         this.tokenAuthenticationFilter = tokenAuthenticationFilter;
     }
 
@@ -40,7 +34,7 @@ public class SecurityConfig  extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
             .antMatchers("/free/**").permitAll()
             .antMatchers("/pub/**").permitAll()
-            .antMatchers("/book/**").authenticated();
+            .antMatchers("/book/**").hasRole("READER");
     }
 
 

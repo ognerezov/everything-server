@@ -1,5 +1,6 @@
 package net.okhotnikov.everything.config.authentication;
 
+import net.okhotnikov.everything.model.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,6 +11,15 @@ import java.util.Collection;
  * Created by Sergey Okhotnikov.
  */
 public class BaseAuthentication implements Authentication {
+
+    public BaseAuthentication() {
+    }
+
+    public BaseAuthentication(User user) {
+        this.authorities = user.roles;
+        this.isAuthenticated = user.enabled;
+        this.principal = user;
+    }
 
     protected Collection<? extends GrantedAuthority> authorities;
 

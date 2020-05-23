@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,7 +32,7 @@ import static net.okhotnikov.everything.service.ElasticService.*;
  * Created by Sergey Okhotnikov.
  */
 @Service
-public class UserService implements UserDetailsService {
+public class UserService {
 
     private final ElasticService elasticService;
     private final ElasticDao dao;
@@ -64,7 +63,6 @@ public class UserService implements UserDetailsService {
         this.emailService = emailService;
     }
 
-    @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
         UserDetails res;
         try {
@@ -134,7 +132,7 @@ public class UserService implements UserDetailsService {
         User user = get(username);
 
         if(user == null || ! passwordEncoder.matches(password,user.password))
-            throw new UnauthorizedException();
+            throw new UnauthorizedException(username);
 
         TokenResponse response = redisService.login(user, tokenType);
 
