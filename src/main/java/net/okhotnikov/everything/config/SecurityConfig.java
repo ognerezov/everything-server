@@ -1,7 +1,7 @@
 package net.okhotnikov.everything.config;
 
 import net.okhotnikov.everything.config.authentication.TokenAuthenticationFilter;
-import net.okhotnikov.everything.config.authentication.TokenAuthenticationProvider;
+import net.okhotnikov.everything.config.cors.CorsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,15 +21,19 @@ import org.springframework.security.web.firewall.HttpFirewall;
 public class SecurityConfig  extends WebSecurityConfigurerAdapter {
 
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
+    private final CorsFilter corsFilter;
 
-    public SecurityConfig(TokenAuthenticationFilter tokenAuthenticationFilter) {
+    public SecurityConfig(TokenAuthenticationFilter tokenAuthenticationFilter, CorsFilter corsFilter) {
         this.tokenAuthenticationFilter = tokenAuthenticationFilter;
+        this.corsFilter = corsFilter;
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-            .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
+        http
+            .addFilterBefore(tokenAuthenticationFilter,UsernamePasswordAuthenticationFilter.class)
             .csrf().disable()
             .authorizeRequests()
             .antMatchers("/free/**").permitAll()

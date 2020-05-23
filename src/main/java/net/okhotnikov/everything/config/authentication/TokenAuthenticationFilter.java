@@ -4,15 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.okhotnikov.everything.exceptions.UnauthorizedException;
 import net.okhotnikov.everything.exceptions.rejection.RejectReason;
 import net.okhotnikov.everything.exceptions.rejection.Rejection;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +29,6 @@ public class TokenAuthenticationFilter implements Filter {
         this.mapper = mapper;
         this.tokenAuthenticationProvider = tokenAuthenticationProvider;
     }
-
     private void returnUnauthorizedResponse(HttpServletResponse response, String message) throws IOException {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType(MediaType.APPLICATION_JSON.toString());
@@ -42,10 +37,14 @@ public class TokenAuthenticationFilter implements Filter {
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-
         HttpServletRequest request = (HttpServletRequest)req;
         HttpServletResponse response = (HttpServletResponse)res;
 
+        String path = request.getServletPath();
+        if(!path.startsWith("/book") ){
+            chain.doFilter(req,res);
+            return;
+        }
 
         Authentication previousAuthentication = SecurityContextHolder.getContext().getAuthentication();
 
