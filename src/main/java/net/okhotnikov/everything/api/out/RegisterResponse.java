@@ -4,21 +4,21 @@ package net.okhotnikov.everything.api.out;
  * Created by Sergey Okhotnikov.
  */
 public class RegisterResponse extends TokenResponse{
-    public String readersToken;
+    public String accessCode;
 
-    public String getReadersToken() {
-        return readersToken;
+    public String getAccessCode() {
+        return accessCode;
     }
 
-    public void setReadersToken(String readersToken) {
-        this.readersToken = readersToken;
+    public void setAccessCode(String accessCode) {
+        this.accessCode = accessCode;
     }
 
     public RegisterResponse() {
     }
 
-    public RegisterResponse(String token, String refreshToken, String readersToken) {
+    public RegisterResponse(String token, String refreshToken, String accessCode) {
         super(token, refreshToken);
-        this.readersToken = readersToken;
+        this.accessCode = accessCode;
     }
 }
