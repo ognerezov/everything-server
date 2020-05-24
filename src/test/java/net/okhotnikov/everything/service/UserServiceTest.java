@@ -148,8 +148,7 @@ public class UserServiceTest {
 
     @Test
     public void changeReaderToken() throws IOException {
-        TokenResponse tokens = userService.loginReader();
 
-        System.out.println(tokens);
+        System.out.println(userService.updateReader());
     }
 }

@@ -94,8 +94,7 @@ public class UserService {
             emailService.send(username,readersToken);
 
         } catch (Exception e){
-            redisDao.delKey(user.token);
-            redisDao.delKey(user.refreshToken);
+            deletePreviousTokens(user);
 
             throw e;
         }
@@ -135,10 +134,15 @@ public class UserService {
             throw new UnauthorizedException(username);
 
         TokenResponse response = redisService.login(user, tokenType);
-
+        deletePreviousTokens(user);
         setTokens(username, response.token, response.refreshToken);
 
         return response;
+    }
+
+    private void deletePreviousTokens(User user) {
+        redisDao.delKey(user.token);
+        redisDao.delKey(user.refreshToken);
     }
 
     private void setTokens(String username, String token, String refreshToken) throws IOException {
