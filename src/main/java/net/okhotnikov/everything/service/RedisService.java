@@ -55,7 +55,7 @@ public class RedisService {
                     json,
                     tokenService.getRefreshTtl() * 60);
 
-            return new TokenResponse(token,refreshToken);
+            return new TokenResponse(token,refreshToken, user.username);
         } catch (JsonProcessingException e) {
            throw new  DataProcessException(e.getClass().getSimpleName());
         }

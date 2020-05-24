@@ -17,8 +17,8 @@ public class RegisterResponse extends TokenResponse{
     public RegisterResponse() {
     }
 
-    public RegisterResponse(String token, String refreshToken, String accessCode) {
-        super(token, refreshToken);
+    public RegisterResponse(String token, String refreshToken, String accessCode, String username) {
+        super(token, refreshToken, username);
         this.accessCode = accessCode;
     }
 }

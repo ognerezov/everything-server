@@ -122,7 +122,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void processReader() throws IOException {
+    public void processReaderTest() throws IOException {
         User user = userService.get(userService.getReaderUsername());
         assertNotNull(user);
 
@@ -144,5 +144,12 @@ public class UserServiceTest {
         token = userService.getReadersToken();
 
         assertEquals(newTokens.token, token);
+    }
+
+    @Test
+    public void changeReaderToken() throws IOException {
+        TokenResponse tokens = userService.loginReader();
+
+        System.out.println(tokens);
     }
 }

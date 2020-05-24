@@ -11,6 +11,7 @@ public class UserRecord {
     public Set<Role> roles;
     public String token;
     public boolean enabled;
+    public boolean bounced;
 
     public UserRecord() {
     }
@@ -59,6 +60,14 @@ public class UserRecord {
         this.enabled = enabled;
     }
 
+    public boolean isBounced() {
+        return bounced;
+    }
+
+    public void setBounced(boolean bounced) {
+        this.bounced = bounced;
+    }
+
     @Override
     public String toString() {
         return "UserRecord{" +
@@ -66,6 +75,7 @@ public class UserRecord {
                 ", roles=" + roles +
                 ", token='" + token + '\'' +
                 ", enabled=" + enabled +
+                ", bounced=" + bounced +
                 '}';
     }
 }
