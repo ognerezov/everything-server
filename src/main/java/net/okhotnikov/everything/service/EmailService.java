@@ -61,9 +61,9 @@ public class EmailService {
         return adminEmail;
     }
 
-    public void send(String username, String readersToken) throws IOException {
+    public int send(String username, String readersToken) throws IOException {
 
-        send(adminEmail,REGISTER_SUBJECT, username, REGISTER_BODY + readersToken);
+        return send(adminEmail,REGISTER_SUBJECT, username, REGISTER_BODY + readersToken);
 
     }
 }

@@ -21,7 +21,7 @@ public class EmailServiceTest {
 
     @Test
     public void test() throws IOException {
-        int res = emailService.send(emailService.getAdminEmail(),"test",emailService.getRootEmail(),"test body");
+        int res = emailService.send("ognerezov@yurnix.tprunu","test");
 
         assertTrue(res >= 200);
         assertTrue(res < 400);

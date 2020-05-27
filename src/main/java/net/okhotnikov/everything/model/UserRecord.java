@@ -11,15 +11,16 @@ public class UserRecord {
     public Set<Role> roles;
     public String token;
     public boolean enabled;
-    public boolean bounced;
+    public String emailStatus;
 
     public UserRecord() {
     }
 
-    public UserRecord(String username, Set<Role> roles, boolean enabled) {
+    public UserRecord(String username, Set<Role> roles, boolean enabled, String emailStatus) {
         this.username = username;
         this.roles = roles;
         this.enabled = enabled;
+        this.emailStatus = emailStatus;
     }
 
     public void setRoles(Set<Role> roles) {
@@ -60,12 +61,12 @@ public class UserRecord {
         this.enabled = enabled;
     }
 
-    public boolean isBounced() {
-        return bounced;
+    public String getEmailStatus() {
+        return emailStatus;
     }
 
-    public void setBounced(boolean bounced) {
-        this.bounced = bounced;
+    public void setEmailStatus(String emailStatus) {
+        this.emailStatus = emailStatus;
     }
 
     @Override
@@ -75,7 +76,7 @@ public class UserRecord {
                 ", roles=" + roles +
                 ", token='" + token + '\'' +
                 ", enabled=" + enabled +
-                ", bounced=" + bounced +
+                ", bounced=" + emailStatus +
                 '}';
     }
 }

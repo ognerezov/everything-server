@@ -34,6 +34,8 @@ import static net.okhotnikov.everything.service.ElasticService.*;
 @Service
 public class UserService {
 
+    public static final String EMAIL_STATUS = "emailStatus";
+    public static final String REASON = "reason";
     private final ElasticService elasticService;
     private final ElasticDao dao;
     private final ObjectMapper mapper;
@@ -81,7 +83,8 @@ public class UserService {
                 username,
                 password,
                 User.getUserRoles(),
-                true
+                true,
+                EMAIL_SENT_STATUS
         );
         TokenResponse response = redisService.login(user, TokenType.BEARER);
         String readersToken = getReadersToken();
@@ -150,6 +153,15 @@ public class UserService {
 
         data.put(TOKEN,token);
         data.put(REFRESH_TOKEN,refreshToken);
+
+        dao.update(USERS,username,data);
+    }
+
+    public void setEmailStatus(String username, String status, String reason) throws IOException {
+        Map<String, Object> data = new HashMap<>();
+
+        data.put(EMAIL_STATUS,status);
+        data.put(REASON,reason);
 
         dao.update(USERS,username,data);
     }

@@ -8,4 +8,6 @@ public interface Literals {
     String REFRESH_TOKEN = "refreshToken";
     String REGISTERED = "registered";
     String DATE_FORMAT = "yyyy-MM-dd";
+    String EMAIL_SENT_STATUS = "sent";
+
 }

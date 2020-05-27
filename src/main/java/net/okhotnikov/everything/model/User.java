@@ -20,19 +20,21 @@ public class User extends UserRecord implements UserDetails {
     public String password;
     public String refreshToken;
     public LocalDate registered = LocalDate.now();
+    public String reason;
 
     public User() {
     }
 
-    public User(String username, String password, Set<Role> roles, boolean enabled) {
+    public User(String username, String password, Set<Role> roles, boolean enabled, String status) {
         this.username = username;
         this.password = password;
         this.roles = roles;
         this.enabled = enabled;
+        this.emailStatus = status;
     }
 
     public User(User user) {
-        this(user.username,user.password, new HashSet<>(user.roles),user.enabled);
+        this(user.username,user.password, new HashSet<>(user.roles),user.enabled,user.emailStatus);
         this.token = user.token;
         this.refreshToken = user.token;
         this.registered = user.registered;
@@ -45,7 +47,7 @@ public class User extends UserRecord implements UserDetails {
     }
 
     public UserRecord toRecord(){
-        return new UserRecord(username,roles, enabled);
+        return new UserRecord(username,roles, enabled, emailStatus);
     }
 
     public void setPassword(String password) {
@@ -69,6 +71,14 @@ public class User extends UserRecord implements UserDetails {
 
     public void setRegistered(LocalDate registered) {
         this.registered = registered;
+    }
+
+    public String getReason() {
+        return reason;
+    }
+
+    public void setReason(String reason) {
+        this.reason = reason;
     }
 
     @Override
@@ -106,10 +116,12 @@ public class User extends UserRecord implements UserDetails {
                 "password='" + password + '\'' +
                 ", refreshToken='" + refreshToken + '\'' +
                 ", registered=" + registered +
+                ", reason='" + reason + '\'' +
                 ", username='" + username + '\'' +
                 ", roles=" + roles +
                 ", token='" + token + '\'' +
                 ", enabled=" + enabled +
+                ", emailStatus='" + emailStatus + '\'' +
                 "} " + super.toString();
     }
 }
