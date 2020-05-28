@@ -1,6 +1,7 @@
 package net.okhotnikov.everything.service;
 
 import static junit.framework.Assert.*;
+import static net.okhotnikov.everything.util.Literals.EMAIL_NOT_SENT_STATUS;
 import static org.junit.Assert.assertNotEquals;
 
 import net.okhotnikov.everything.api.out.TokenResponse;
@@ -89,7 +90,7 @@ public class UserServiceTest {
 
     @Test
     public void getNewUsers() throws IOException {
-        User user = new User(TEST_USER_NAME,TEST_PASSWORD,new HashSet<>(),true);
+        User user = new User(TEST_USER_NAME,TEST_PASSWORD,new HashSet<>(),true,EMAIL_NOT_SENT_STATUS);
         LocalDate date = LocalDate.now();
 
         user.registered = date.plus(1, ChronoUnit.DAYS);
@@ -150,5 +151,10 @@ public class UserServiceTest {
     public void changeReaderToken() throws IOException {
 
         System.out.println(userService.updateReader());
+    }
+
+    @Test
+    public void printDefaultUserStatus() throws IOException {
+        System.out.println(userService.get(TEST_USER_NAME).emailStatus);
     }
 }

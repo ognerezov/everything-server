@@ -29,6 +29,8 @@ public class EmailService {
     public static final String REGISTER_SUBJECT ="Добро пожаловать в сообщество everything-from.one";
     public static final String REGISTER_BODY = "К письму приложен код доступка к числам. Код один для всех пользователей, но действует ограниченное время. В течение 7 дней после регистрации вы будете получать новые коды доступа по почте." +
             " По окончании этого периода для получения нового кода приводите новых пользователей или свяжитесь с администрацией. Ваш код доступа: ";
+    public static final String RENEW_SUBJECT ="Обновленный код достпуа для everything-from.one";
+    public static final String RENEW_BODY = "Ваш новый код доступа: ";
 
 
 
@@ -62,8 +64,10 @@ public class EmailService {
     }
 
     public int send(String username, String readersToken) throws IOException {
-
         return send(adminEmail,REGISTER_SUBJECT, username, REGISTER_BODY + readersToken);
+    }
 
+    public int sendRenew(String username, String readersToken) throws IOException {
+        return send(adminEmail,RENEW_SUBJECT, username, RENEW_BODY + readersToken);
     }
 }

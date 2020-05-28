@@ -204,7 +204,7 @@ public class UserService {
         for(User user: res){
             try {
 
-                emailService.send(user.username,tokenResponse.token);
+                emailService.sendRenew(user.username,tokenResponse.token);
 
             }catch (Exception e){
                 LOG.error((user == null? "null" : user.username) +" -> "+e.getClass().getSimpleName());
