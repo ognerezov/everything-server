@@ -19,11 +19,4 @@ public class EmailServiceTest {
     @Autowired
     private EmailService emailService;
 
-    @Test
-    public void test() throws IOException {
-        int res = emailService.send("ognerezov@yurnix.tprunu","test");
-
-        assertTrue(res >= 200);
-        assertTrue(res < 400);
-    }
 }

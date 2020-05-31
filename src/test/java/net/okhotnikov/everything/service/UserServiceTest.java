@@ -82,13 +82,6 @@ public class UserServiceTest {
     }
 
     @Test
-    public void deleteTestUser() throws IOException {
-        userService.delete(TEST_USER_NAME);
-
-        assertNull(userService.get(TEST_USER_NAME));
-    }
-
-    @Test
     public void getNewUsers() throws IOException {
         User user = new User(TEST_USER_NAME,TEST_PASSWORD,new HashSet<>(),true,EMAIL_NOT_SENT_STATUS);
         LocalDate date = LocalDate.now();
@@ -109,52 +102,6 @@ public class UserServiceTest {
 
         assertNull(userService.get(TEST_USER_NAME));
     }
-    @Test
-    public void printToken() throws IOException {
-        System.out.println(userService.getReadersToken());
-    }
-
-    @Test
-    public void registerTestUser() throws IOException {
-
-        userService.register(TEST_USER_NAME,TEST_PASSWORD);
-
-        System.out.println(userService.get(TEST_USER_NAME));
-    }
-
-    @Test
-    public void processReaderTest() throws IOException {
-        User user = userService.get(userService.getReaderUsername());
-        assertNotNull(user);
 
 
-        System.out.println(user);
-
-        TokenResponse tokens = userService.loginReader();
-
-        assertEquals(tokenService.getReaderTokenLength(),tokens.token.length());
-
-        String token = userService.getReadersToken();
-
-        assertEquals(tokens.token, token);
-
-        TokenResponse newTokens  = userService.loginReader();
-
-        assertNotEquals(token, newTokens.token);
-
-        token = userService.getReadersToken();
-
-        assertEquals(newTokens.token, token);
-    }
-
-    @Test
-    public void changeReaderToken() throws IOException {
-
-        System.out.println(userService.updateReader());
-    }
-
-    @Test
-    public void printDefaultUserStatus() throws IOException {
-        System.out.println(userService.get(TEST_USER_NAME).emailStatus);
-    }
 }
