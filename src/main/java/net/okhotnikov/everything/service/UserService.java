@@ -102,7 +102,7 @@ public class UserService {
             throw e;
         }
 
-        return new RegisterResponse(response.token, response.refreshToken,readersToken,username);
+        return new RegisterResponse(response.token, response.refreshToken,null,username);
     }
 
     public User get(String username) throws IOException {

@@ -11,10 +11,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.CountRequest;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.Operator;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -24,7 +21,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static net.okhotnikov.everything.util.Literals.DATE_FORMAT;
+import static net.okhotnikov.everything.util.Literals.*;
 
 /**
  * Created by Sergey Okhotnikov.
@@ -94,11 +91,17 @@ public class ElasticDao {
                 .collect(Collectors.toList());
     }
 
-    public List<Map<String, Object>> getAfter(String index, String field, String value) throws IOException {
+    public List<Map<String, Object>> getValidAfter(String index, String field, String value) throws IOException {
+        MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(EMAIL_STATUS_FIELD, EMAIL_STATUS_DELIVERED);
+        return getAfter(index,field,value,matchQueryBuilder);
+    }
+
+    public List<Map<String, Object>> getAfter(String index, String field, String value, AbstractQueryBuilder queryBuilder) throws IOException {
         RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(field).gt(value).format(DATE_FORMAT);
 
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
                 .query(rangeQueryBuilder)
+                .query(queryBuilder)
                 .from(0);
 
         SearchHit[] hits =
@@ -110,4 +113,5 @@ public class ElasticDao {
                 .map(SearchHit::getSourceAsMap)
                 .collect(Collectors.toList());
     }
+
 }

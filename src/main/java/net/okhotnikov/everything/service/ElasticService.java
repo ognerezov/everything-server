@@ -2,7 +2,6 @@ package net.okhotnikov.everything.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.okhotnikov.everything.dao.ElasticDao;
 import net.okhotnikov.everything.util.DataUtil;
 import org.elasticsearch.action.search.SearchResponse;
@@ -62,7 +61,7 @@ public class ElasticService {
 
 
     public <T> List<T> getAfter(String index, String field, LocalDate value, TypeReference<T> typeReference) throws IOException{
-        List<Map<String,Object>> res = dao.getAfter(index,field,value.format(DATE_FORMATTER));
+        List<Map<String,Object>> res = dao.getValidAfter(index,field,value.format(DATE_FORMATTER));
 
         return res
                 .stream()

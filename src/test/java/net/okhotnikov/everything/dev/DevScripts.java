@@ -15,6 +15,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+
 import org.slf4j.Logger;
 
 import static junit.framework.Assert.*;
@@ -111,7 +115,19 @@ public class DevScripts {
     }
 
     @Test
-    public void printDefaultUserStatus() throws IOException {
+    public void printUserStatus() throws IOException {
+        System.out.println(userService.get(TEST_USER_NAME).emailStatus);
+        System.out.println(userService.get("notemail@notaddress.not").emailStatus);
         System.out.println(userService.get("sergey@okhotnikov.net").emailStatus);
+    }
+
+    @Test
+    public void getUsersAfter() throws IOException {
+        LocalDate date = LocalDate.now().minus(1,ChronoUnit.YEARS);
+
+        List<User> res = userService.getAfter(date);
+        System.out.println(res);
+        System.out.println(res.size());
+
     }
 }
