@@ -6,10 +6,14 @@ import net.okhotnikov.everything.api.out.TokenResponse;
 import net.okhotnikov.everything.dao.RedisDao;
 import net.okhotnikov.everything.exceptions.DataProcessException;
 import net.okhotnikov.everything.exceptions.UnauthorizedException;
+import net.okhotnikov.everything.exceptions.service.NotVerifiedEmailException;
 import net.okhotnikov.everything.model.TokenType;
 import net.okhotnikov.everything.model.User;
 import net.okhotnikov.everything.model.UserRecord;
 import org.springframework.stereotype.Service;
+
+import static net.okhotnikov.everything.util.Literals.EMAIL_NOT_SENT_STATUS;
+import static net.okhotnikov.everything.util.Literals.EMAIL_SENT_STATUS;
 
 /**
  * Created by Sergey Okhotnikov.
@@ -55,7 +59,7 @@ public class RedisService {
                     json,
                     tokenService.getRefreshTtl() * 60);
 
-            return new TokenResponse(token,refreshToken, user.username);
+            return new TokenResponse(token,refreshToken, user.username, user.emailStatus);
         } catch (JsonProcessingException e) {
            throw new  DataProcessException(e.getClass().getSimpleName());
         }
@@ -79,14 +83,16 @@ public class RedisService {
         return user;
     }
 
-    public TokenResponse refresh(String refreshToken){
+    public TokenResponse refresh(String refreshToken) throws NotVerifiedEmailException {
         return refresh(refreshToken,TokenType.BEARER);
     }
 
-    public TokenResponse refresh(String refreshToken, TokenType tokenType){
+    public TokenResponse refresh(String refreshToken, TokenType tokenType) throws NotVerifiedEmailException {
         User user = auth(refreshToken);
         if(user == null)
             throw new UnauthorizedException(refreshToken);
+        if(user.emailStatus == null || user.emailStatus.equals(EMAIL_SENT_STATUS) || user.emailStatus.equals(EMAIL_NOT_SENT_STATUS))
+            throw new NotVerifiedEmailException();
 
         dao.delKey(refreshToken);
         dao.delKey(user.token);

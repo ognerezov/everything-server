@@ -8,6 +8,7 @@ import net.okhotnikov.everything.dao.ElasticDao;
 import net.okhotnikov.everything.dao.RedisDao;
 import net.okhotnikov.everything.exceptions.DuplicatedKeyException;
 import net.okhotnikov.everything.exceptions.UnauthorizedException;
+import net.okhotnikov.everything.exceptions.service.NotVerifiedEmailException;
 import net.okhotnikov.everything.model.TokenType;
 import net.okhotnikov.everything.model.User;
 import org.slf4j.Logger;
@@ -102,7 +103,7 @@ public class UserService {
             throw e;
         }
 
-        return new RegisterResponse(response.token, response.refreshToken,null,username);
+        return new RegisterResponse(response.token, response.refreshToken,null,username, EMAIL_SENT_STATUS);
     }
 
     public User get(String username) throws IOException {
@@ -171,8 +172,12 @@ public class UserService {
     }
 
     public TokenResponse refresh(String token) throws IOException {
-        try{
+        try {
             return redisService.refresh(token);
+        }catch (NotVerifiedEmailException e){
+            String username = auth(token).username;
+            User user = get(username);
+            return redisService.login(user);
         }catch (UnauthorizedException exception){
             User user = elasticService.getByUniqueField(USERS,REFRESH_TOKEN, token, new TypeReference<User>(){});
             if (user != null){

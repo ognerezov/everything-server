@@ -96,6 +96,13 @@ public class DevScripts {
     }
 
     @Test
+    public void deleteFakeUser() throws IOException {
+        userService.delete("notemail@notaddress.not");
+
+        assertNull(userService.get("notemail@notaddress.not"));
+    }
+
+    @Test
     public void printToken() throws IOException {
         System.out.println(userService.getReadersToken());
     }

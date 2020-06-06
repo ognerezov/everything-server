@@ -7,14 +7,16 @@ public class TokenResponse {
     public String token;
     public String refreshToken;
     public String username;
+    public String emailStatus;
 
     public TokenResponse() {
     }
 
-    public TokenResponse(String token, String refreshToken, String username) {
+    public TokenResponse(String token, String refreshToken, String username, String emailStatus) {
         this.token = token;
         this.refreshToken = refreshToken;
         this.username = username;
+        this.emailStatus = emailStatus;
     }
 
     public String getToken() {
@@ -39,5 +41,13 @@ public class TokenResponse {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getEmailStatus() {
+        return emailStatus;
+    }
+
+    public void setEmailStatus(String emailStatus) {
+        this.emailStatus = emailStatus;
     }
 }
