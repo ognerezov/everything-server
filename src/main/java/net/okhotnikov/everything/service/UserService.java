@@ -7,8 +7,10 @@ import net.okhotnikov.everything.api.out.TokenResponse;
 import net.okhotnikov.everything.dao.ElasticDao;
 import net.okhotnikov.everything.dao.RedisDao;
 import net.okhotnikov.everything.exceptions.DuplicatedKeyException;
+import net.okhotnikov.everything.exceptions.NotFoundException;
 import net.okhotnikov.everything.exceptions.UnauthorizedException;
 import net.okhotnikov.everything.exceptions.service.NotVerifiedEmailException;
+import net.okhotnikov.everything.model.Role;
 import net.okhotnikov.everything.model.TokenType;
 import net.okhotnikov.everything.model.User;
 import org.slf4j.Logger;
@@ -103,7 +105,7 @@ public class UserService {
             throw e;
         }
 
-        return new RegisterResponse(response.token, response.refreshToken,null,username, EMAIL_SENT_STATUS);
+        return new RegisterResponse(response.token, response.refreshToken,null,username, EMAIL_SENT_STATUS,user.roles);
     }
 
     public User get(String username) throws IOException {
@@ -137,16 +139,15 @@ public class UserService {
         if(user == null || ! passwordEncoder.matches(password,user.password))
             throw new UnauthorizedException(username);
 
-        TokenResponse response = redisService.login(user, tokenType);
         deletePreviousTokens(user);
+        TokenResponse response = redisService.login(user, tokenType);
         setTokens(username, response.token, response.refreshToken);
 
         return response;
     }
 
     private void deletePreviousTokens(User user) {
-        redisDao.delKey(user.token);
-        redisDao.delKey(user.refreshToken);
+        redisService.revokeTokens(user);
     }
 
     private void setTokens(String username, String token, String refreshToken) throws IOException {
@@ -216,6 +217,17 @@ public class UserService {
             }
         }
         return tokenResponse.token;
+    }
+
+    public void addRole(String username, Role role) throws IOException {
+        User user = get(username);
+        if(user == null)
+            throw new NotFoundException();
+        user.roles.add(role);
+        Map<String, Object> data = new HashMap<>();
+        data.put(ROLES,user.roles);
+        dao.update(USERS,username,data);
+        redisService.update(user);
     }
 
     public String getReadersToken() throws IOException {

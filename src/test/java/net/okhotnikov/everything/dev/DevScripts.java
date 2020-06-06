@@ -2,8 +2,10 @@ package net.okhotnikov.everything.dev;
 
 import net.okhotnikov.everything.api.out.TokenResponse;
 import net.okhotnikov.everything.dao.RedisDao;
+import net.okhotnikov.everything.model.Role;
 import net.okhotnikov.everything.model.User;
 import net.okhotnikov.everything.service.EmailService;
+import net.okhotnikov.everything.service.RedisService;
 import net.okhotnikov.everything.service.TokenService;
 import net.okhotnikov.everything.service.UserService;
 import org.junit.Before;
@@ -48,6 +50,9 @@ public class DevScripts {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private RedisService redisService;
 
     @Before
     public void  before(){
@@ -135,6 +140,18 @@ public class DevScripts {
         List<User> res = userService.getAfter(date);
         System.out.println(res);
         System.out.println(res.size());
+    }
 
+    @Test
+    public void testAddRole() throws IOException {
+        userService.addRole(TEST_USER_NAME, Role.ROLE_READER);
+        User stored = userService.get(TEST_USER_NAME);
+
+        assertTrue(stored.roles.contains(Role.ROLE_READER));
+    }
+
+    @Test
+    public void getUserByToken(){
+        System.out.println(redisService.auth("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJldmVyeXRoaW5nIiwiY2xpZW50VHlwZSI6InVzZXIiLCJleHAiOjE1OTM4Njc1NTUsInVzZXJuYW1lIjoib2duZXJlem92QHlhbmRleC5ydSIsInRva2VuX2NyZWF0ZV9kYXRlIjoxNTkxNDQ4MzU1MjUwfQ.q4iuiCQEgL4itGus7LniG6eIvxzj7SOQ0x_qhsT50PbPfJbfgWSnQv00HpFXZWfzHIVHB6J2G3vnEhA3ySATQg"));
     }
 }

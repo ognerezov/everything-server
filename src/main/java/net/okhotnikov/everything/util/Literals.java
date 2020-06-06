@@ -6,6 +6,7 @@ package net.okhotnikov.everything.util;
 public interface Literals {
     String TOKEN = "token";
     String REFRESH_TOKEN = "refreshToken";
+    String ROLES = "roles";
     String REGISTERED = "registered";
     String DATE_FORMAT = "yyyy-MM-dd";
     String EMAIL_STATUS_FIELD = "emailStatus";

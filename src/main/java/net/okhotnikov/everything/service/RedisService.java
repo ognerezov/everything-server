@@ -36,33 +36,34 @@ public class RedisService {
     }
 
     public TokenResponse login(User user, TokenType tokenType){
-        String token = tokenService.getToken(user.username, tokenType);
-        String refreshToken = tokenService.getToken(user.username,TokenType.REFRESH);
-
+        user.token = tokenService.getToken(user.username, tokenType);
+        user.refreshToken = tokenService.getToken(user.username,TokenType.REFRESH);
         try {
-            UserRecord userRecord = user.toRecord();
-            userRecord.token = token;
-            String json = mapper.writeValueAsString(userRecord);
-            dao.putString(
-                    token,
-                    json,
-                    tokenService.getTokenTtl()*60
-            );
-
-            /*
-             * that record should not be used for direct authentication
-             */
-            userRecord.enabled = false;
-            json = mapper.writeValueAsString(userRecord);
-            dao.putString(
-                    refreshToken,
-                    json,
-                    tokenService.getRefreshTtl() * 60);
-
-            return new TokenResponse(token,refreshToken, user.username, user.emailStatus);
+            update(user);
+            return new TokenResponse(user.token,user.refreshToken, user.username, user.emailStatus,user.roles);
         } catch (JsonProcessingException e) {
            throw new  DataProcessException(e.getClass().getSimpleName());
         }
+    }
+
+    public void update(User user) throws JsonProcessingException {
+        UserRecord userRecord = user.toRecord();
+        String json = mapper.writeValueAsString(userRecord);
+        dao.putString(
+                user.token,
+                json,
+                tokenService.getTokenTtl()*60
+        );
+
+        /*
+         * that record should not be used for direct authentication
+         */
+        userRecord.enabled = false;
+        json = mapper.writeValueAsString(userRecord);
+        dao.putString(
+                user.refreshToken,
+                json,
+                tokenService.getRefreshTtl() * 60);
     }
 
     public User auth(String token){
@@ -94,14 +95,16 @@ public class RedisService {
         if(user.emailStatus == null || user.emailStatus.equals(EMAIL_SENT_STATUS) || user.emailStatus.equals(EMAIL_NOT_SENT_STATUS))
             throw new NotVerifiedEmailException();
 
-        dao.delKey(refreshToken);
-        dao.delKey(user.token);
+        user.refreshToken =refreshToken;
+        revokeTokens(user);
 
         return login(user, tokenType);
     }
 
     public void revokeTokens(User user) {
-        dao.delKey(user.token);
-        dao.delKey(user.refreshToken);
+        if(user.token != null)
+            dao.delKey(user.token);
+        if(user.refreshToken != null)
+            dao.delKey(user.refreshToken);
     }
 }
