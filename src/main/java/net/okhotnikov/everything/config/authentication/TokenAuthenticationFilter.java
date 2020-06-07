@@ -41,7 +41,7 @@ public class TokenAuthenticationFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse)res;
 
         String path = request.getServletPath();
-        if(!path.startsWith("/book") ){
+        if(!path.startsWith("/book") && !path.startsWith("/admin")){
             chain.doFilter(req,res);
             return;
         }

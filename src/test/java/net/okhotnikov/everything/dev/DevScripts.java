@@ -102,9 +102,9 @@ public class DevScripts {
 
     @Test
     public void deleteFakeUser() throws IOException {
-        userService.delete("notemail@notaddress.not");
+        userService.delete("Ognerezov");
 
-        assertNull(userService.get("notemail@notaddress.not"));
+        assertNull(userService.get("Ognerezov"));
     }
 
     @Test
@@ -122,7 +122,6 @@ public class DevScripts {
 
     @Test
     public void changeReaderToken() throws IOException {
-
         System.out.println(userService.updateReader());
     }
 
@@ -144,10 +143,10 @@ public class DevScripts {
 
     @Test
     public void testAddRole() throws IOException {
-        userService.addRole(TEST_USER_NAME, Role.ROLE_READER);
-        User stored = userService.get(TEST_USER_NAME);
+        userService.addRole("ognerezov@gmail.com", Role.ROLE_ADMIN);
+        User stored = userService.get("ognerezov@gmail.com");
 
-        assertTrue(stored.roles.contains(Role.ROLE_READER));
+        assertTrue(stored.roles.contains(Role.ROLE_ADMIN));
     }
 
     @Test
