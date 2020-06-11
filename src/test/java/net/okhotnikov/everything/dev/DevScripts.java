@@ -143,10 +143,10 @@ public class DevScripts {
 
     @Test
     public void testAddRole() throws IOException {
-        userService.addRole("ognerezov@gmail.com", Role.ROLE_ADMIN);
-        User stored = userService.get("ognerezov@gmail.com");
+        userService.addRole("kongfupapa@gmail.com", Role.ROLE_READER);
+        User stored = userService.get("kongfupapa@gmail.com");
 
-        assertTrue(stored.roles.contains(Role.ROLE_ADMIN));
+        assertTrue(stored.roles.contains(Role.ROLE_READER));
     }
 
     @Test
