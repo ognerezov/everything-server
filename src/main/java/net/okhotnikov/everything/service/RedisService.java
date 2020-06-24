@@ -39,7 +39,7 @@ public class RedisService {
         user.token = tokenService.getToken(user.username, tokenType);
         user.refreshToken = tokenService.getToken(user.username,TokenType.REFRESH);
         try {
-            update(user);
+            update(user, tokenType);
             return new TokenResponse(user.token,user.refreshToken, user.username, user.emailStatus,user.roles);
         } catch (JsonProcessingException e) {
            throw new  DataProcessException(e.getClass().getSimpleName());
@@ -47,12 +47,18 @@ public class RedisService {
     }
 
     public void update(User user) throws JsonProcessingException {
+        update(user,TokenType.BEARER);
+    }
+
+    public void update(User user, TokenType tokenType) throws JsonProcessingException {
         UserRecord userRecord = user.toRecord();
         String json = mapper.writeValueAsString(userRecord);
         dao.putString(
                 user.token,
                 json,
-                tokenService.getTokenTtl()*60
+                tokenType == TokenType.ACCESS_CODE ?
+                        tokenService.getRefreshTtl() * 60 :
+                        tokenService.getTokenTtl()*60
         );
 
         /*
@@ -65,6 +71,7 @@ public class RedisService {
                 json,
                 tokenService.getRefreshTtl() * 60);
     }
+
 
     public User auth(String token){
         User user = null;
