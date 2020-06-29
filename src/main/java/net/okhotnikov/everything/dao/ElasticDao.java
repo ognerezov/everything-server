@@ -10,11 +10,13 @@ import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.stereotype.Repository;
 
 import java.io.IOException;
@@ -29,6 +31,7 @@ import static net.okhotnikov.everything.util.Literals.*;
 @Repository
 public class ElasticDao {
 
+    public static final int SEARCH_QUERY_LIMIT = 10000;
     private final RestHighLevelClient client;
 
     public ElasticDao(RestHighLevelClient client) {
@@ -102,7 +105,9 @@ public class ElasticDao {
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
                 .query(rangeQueryBuilder)
                 .query(queryBuilder)
-                .from(0);
+                .from(0)
+                //TODO fix size it could be a lot of users
+                .size(10000);
 
         SearchHit[] hits =
                 client.search(new SearchRequest(new String[]{index},sourceBuilder),RequestOptions.DEFAULT)
@@ -114,4 +119,22 @@ public class ElasticDao {
                 .collect(Collectors.toList());
     }
 
+    public List<Map<String, Object>> getWithText(String index, String text, String order, SortOrder sortOrder) throws IOException {
+        MultiMatchQueryBuilder matchQueryBuilder = new MultiMatchQueryBuilder(text).fuzziness(Fuzziness.AUTO);
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
+                .query(matchQueryBuilder)
+                .sort(order, sortOrder)
+                .from(0)
+                .size(SEARCH_QUERY_LIMIT);
+        client.search(new SearchRequest(new String[]{index},sourceBuilder),RequestOptions.DEFAULT);
+
+        SearchHit[] hits =
+                client.search(new SearchRequest(new String[]{index},sourceBuilder),RequestOptions.DEFAULT)
+                        .getHits().getHits();
+
+        return Arrays
+                .stream(hits)
+                .map(SearchHit::getSourceAsMap)
+                .collect(Collectors.toList());
+    }
 }

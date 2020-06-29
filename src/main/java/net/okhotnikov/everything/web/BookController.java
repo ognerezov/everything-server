@@ -51,4 +51,9 @@ public class BookController {
     public List<Map<String, Object>> getRules() throws IOException {
         return elasticService.getRules();
     }
+
+    @GetMapping("/search/{text:.+}")
+    public List<Map<String, Object>> search(@PathVariable String text) throws IOException {
+        return elasticService.getChaptersWithText(text);
+    }
 }

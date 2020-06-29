@@ -6,6 +6,7 @@ import net.okhotnikov.everything.dao.ElasticDao;
 import net.okhotnikov.everything.util.DataUtil;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ public class ElasticService {
     public static final String RULES = "rules";
     public static final String USERS = "users";
     public static final DateTimeFormatter DATE_FORMATTER =DateTimeFormatter.ofPattern(DATE_FORMAT);
+    public static final String BOOK_ORDER = "number";
 
     @Value("${app.quotations.response}")
     private int quotationsCount;
@@ -102,5 +104,9 @@ public class ElasticService {
                 .stream(response.getHits().getHits())
                 .map(SearchHit::getSourceAsMap)
                 .collect(Collectors.toList());
+    }
+
+    public List<Map<String, Object>> getChaptersWithText(String text) throws IOException {
+        return dao.getWithText(BOOK,text, BOOK_ORDER, SortOrder.DESC);
     }
 }

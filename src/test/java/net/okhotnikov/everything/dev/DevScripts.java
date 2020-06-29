@@ -1,6 +1,7 @@
 package net.okhotnikov.everything.dev;
 
 import net.okhotnikov.everything.api.out.TokenResponse;
+import net.okhotnikov.everything.dao.ElasticDao;
 import net.okhotnikov.everything.dao.RedisDao;
 import net.okhotnikov.everything.model.Role;
 import net.okhotnikov.everything.model.User;
@@ -8,6 +9,7 @@ import net.okhotnikov.everything.service.EmailService;
 import net.okhotnikov.everything.service.RedisService;
 import net.okhotnikov.everything.service.TokenService;
 import net.okhotnikov.everything.service.UserService;
+import org.elasticsearch.search.sort.SortOrder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +22,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 
@@ -53,6 +56,9 @@ public class DevScripts {
 
     @Autowired
     private RedisService redisService;
+
+    @Autowired
+    private ElasticDao elasticDao;
 
     @Before
     public void  before(){
@@ -157,5 +163,16 @@ public class DevScripts {
     @Test
     public void testLoginReader() throws IOException {
         userService.loginReader();
+    }
+
+    @Test
+    public void testSearchTest() throws IOException{
+        List<Map<String, Object>> res = elasticDao.getWithText("book", "предательств","number", SortOrder.DESC);
+        System.out.println(res.size());
+        int count =0;
+        for (Map<String,Object> map: res){
+            System.out.println(map);
+            System.out.println("_______________________________________________" + count++ + "_______________________________________________");
+        }
     }
 }
