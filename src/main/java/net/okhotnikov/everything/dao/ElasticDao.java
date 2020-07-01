@@ -120,8 +120,7 @@ public class ElasticDao {
     }
 
     public List<Map<String, Object>> getWithText(String index, String text, String order, SortOrder sortOrder) throws IOException {
-        MultiMatchQueryBuilder matchQueryBuilder = new MultiMatchQueryBuilder(text);
-//                .fuzziness(Fuzziness.AUTO);
+        MultiMatchQueryBuilder matchQueryBuilder = new MultiMatchQueryBuilder(text).type(MultiMatchQueryBuilder.Type.PHRASE_PREFIX);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
                 .query(matchQueryBuilder)
                 .sort(order, sortOrder)
