@@ -31,4 +31,9 @@ public class AdminController {
     public void changeReadersToken() throws IOException {
         userService.updateReader();
     }
+
+    @GetMapping("/restore")
+    public void restoreReadersToken() throws IOException {
+        userService.restoreReadersToken();
+    }
 }

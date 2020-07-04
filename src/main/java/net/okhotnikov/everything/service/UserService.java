@@ -244,4 +244,8 @@ public class UserService {
         return readerUsername;
     }
 
+    public void restoreReadersToken() throws IOException {
+        User user = get(readerUsername);
+        redisService.update(user,TokenType.ACCESS_CODE);
+    }
 }

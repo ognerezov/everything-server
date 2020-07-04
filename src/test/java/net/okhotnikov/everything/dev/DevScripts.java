@@ -175,4 +175,9 @@ public class DevScripts {
             System.out.println("_______________________________________________" + count++ + "_______________________________________________");
         }
     }
+
+    @Test
+    public void restoreReadersToken() throws IOException {
+        userService.restoreReadersToken();
+    }
 }
