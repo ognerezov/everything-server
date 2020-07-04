@@ -3,6 +3,7 @@ package net.okhotnikov.everything.service;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.okhotnikov.everything.dao.ElasticDao;
+import net.okhotnikov.everything.exceptions.NotFoundException;
 import net.okhotnikov.everything.util.DataUtil;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.SearchHit;
@@ -44,7 +45,10 @@ public class ElasticService {
     }
 
     public Map<String, Object> get(String id) throws IOException {
-        return get(id,BOOK);
+        Map<String,Object> res = get(id,BOOK);
+        if(res.isEmpty())
+            throw new NotFoundException();
+        return res;
     }
 
     public Map<String, Object> get(String id,String index) throws IOException {
@@ -107,6 +111,9 @@ public class ElasticService {
     }
 
     public List<Map<String, Object>> getChaptersWithText(String text) throws IOException {
-        return dao.getWithText(BOOK,text, BOOK_ORDER, SortOrder.DESC);
+        List<Map<String, Object>> res = dao.getWithText(BOOK,text, BOOK_ORDER, SortOrder.DESC);
+        if(res.isEmpty())
+            throw new NotFoundException();
+        return res;
     }
 }
