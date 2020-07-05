@@ -70,4 +70,8 @@ public class EmailService {
     public int sendRenew(String username, String readersToken) throws IOException {
         return send(adminEmail,RENEW_SUBJECT, username, RENEW_BODY + readersToken);
     }
+
+    public int sendFromUser(String username, String theme, String message) throws IOException {
+        return send(username,theme,adminEmail,message);
+    }
 }

@@ -14,6 +14,7 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 /**
  * Created by Sergey Okhotnikov.
@@ -41,7 +42,7 @@ public class TokenAuthenticationFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse)res;
 
         String path = request.getServletPath();
-        if(!path.startsWith("/book") && !path.startsWith("/admin")){
+        if(!path.matches("^/book.*|^/admin.*|^/usr.*")){
             chain.doFilter(req,res);
             return;
         }

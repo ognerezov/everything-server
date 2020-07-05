@@ -1,10 +1,12 @@
 package net.okhotnikov.everything.web;
 
 import net.okhotnikov.everything.api.in.RegisterRequest;
+import net.okhotnikov.everything.api.in.SupportRequest;
 import net.okhotnikov.everything.api.in.TokenRequest;
 import net.okhotnikov.everything.api.out.RegisterResponse;
 import net.okhotnikov.everything.api.out.TokenResponse;
 import net.okhotnikov.everything.exceptions.ElasticOperationException;
+import net.okhotnikov.everything.service.EmailService;
 import net.okhotnikov.everything.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +52,4 @@ public class PubController {
             throw new ElasticOperationException();
         }
     }
-
-
 }
