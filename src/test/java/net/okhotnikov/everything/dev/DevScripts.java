@@ -9,6 +9,8 @@ import net.okhotnikov.everything.service.EmailService;
 import net.okhotnikov.everything.service.RedisService;
 import net.okhotnikov.everything.service.TokenService;
 import net.okhotnikov.everything.service.UserService;
+import net.okhotnikov.everything.util.DataUtil;
+import net.okhotnikov.everything.web.FreeBookController;
 import org.elasticsearch.search.sort.SortOrder;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,6 +44,8 @@ public class DevScripts {
     private final Logger LOG = LoggerFactory.getLogger(DevScripts.class);
 
 
+    @Autowired
+    private FreeBookController freeBookController;
 
     @Autowired
     private EmailService emailService;
@@ -123,6 +127,11 @@ public class DevScripts {
 
         userService.register(TEST_USER_NAME,TEST_PASSWORD);
 
+        getTestUser();
+    }
+
+    @Test
+    public void getTestUser() throws IOException {
         System.out.println(userService.get(TEST_USER_NAME));
     }
 
@@ -179,5 +188,11 @@ public class DevScripts {
     @Test
     public void restoreReadersToken() throws IOException {
         userService.restoreReadersToken();
+    }
+
+    @Test
+    public void testDateNumbers() throws IOException {
+        System.out.println(DataUtil.getDateNumbers(232));
+        System.out.println(freeBookController.getNumberOfTheDay());
     }
 }
