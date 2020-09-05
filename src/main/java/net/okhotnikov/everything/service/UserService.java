@@ -44,9 +44,9 @@ public class UserService {
     private final ObjectMapper mapper;
     private final PasswordEncoder passwordEncoder;
     private final RedisService redisService;
-    private final RedisDao redisDao;
     private final EmailService emailService;
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
+    private final TokenService tokenService;
 
     @Value("${reader.password}")
     private String readerPassword;
@@ -58,14 +58,14 @@ public class UserService {
     private int trialPeriod;
 
 
-    public UserService(ElasticService elasticService, ElasticDao dao, ObjectMapper mapper, PasswordEncoder passwordEncoder, RedisService redisService, RedisDao redisDao, EmailService emailService) {
+    public UserService(ElasticService elasticService, ElasticDao dao, ObjectMapper mapper, PasswordEncoder passwordEncoder, RedisService redisService, EmailService emailService, TokenService tokenService) {
         this.elasticService = elasticService;
         this.dao = dao;
         this.mapper = mapper;
         this.passwordEncoder = passwordEncoder;
         this.redisService = redisService;
-        this.redisDao = redisDao;
         this.emailService = emailService;
+        this.tokenService = tokenService;
     }
 
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
@@ -178,11 +178,13 @@ public class UserService {
         }catch (NotVerifiedEmailException e){
             String username = auth(token).username;
             User user = get(username);
+            redisService.revokeTokens(user);
             return redisService.login(user);
         }catch (UnauthorizedException exception){
             User user = elasticService.getByUniqueField(USERS,REFRESH_TOKEN, token, new TypeReference<User>(){});
             if (user != null){
                 redisService.revokeTokens(user);
+                System.out.println("Erase tokens for user: "+ user.username);
                 setTokens(user.username,null,null);
             }
 
@@ -247,5 +249,19 @@ public class UserService {
     public void restoreReadersToken() throws IOException {
         User user = get(readerUsername);
         redisService.update(user,TokenType.ACCESS_CODE);
+    }
+
+    public void setTemporalCode(User user) throws IOException {
+        user.token = tokenService.getToken(user.username,TokenType.TEMP_CODE);
+        redisService.temp(user);
+        emailService.sendTempCode(user.username, user.token);
+    }
+
+    public void setPassword(String username, String password) throws IOException {
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("password",passwordEncoder.encode(password));
+
+        dao.update(USERS,username,data);
     }
 }

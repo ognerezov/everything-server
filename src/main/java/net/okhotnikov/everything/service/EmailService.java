@@ -32,6 +32,8 @@ public class EmailService {
     public static final String RENEW_SUBJECT ="Обновленный код достпуа для everything-from.one";
     public static final String RENEW_BODY = "Ваш новый код доступа: ";
 
+    public static final String TEMP_CODE_SUBJECT = "Код для восстановления пароля everything-from.one";
+    public static final String TEMP_CODE_BODY = "Ваш код доступа: ";
 
 
     public EmailService(SendGrid sg) {
@@ -63,8 +65,8 @@ public class EmailService {
         return adminEmail;
     }
 
-    public int send(String username, String readersToken) throws IOException {
-        return send(adminEmail,REGISTER_SUBJECT, username, REGISTER_BODY + readersToken);
+    public int send(String username, String token) throws IOException {
+        return send(adminEmail,REGISTER_SUBJECT, username, REGISTER_BODY + token);
     }
 
     public int sendRenew(String username, String readersToken) throws IOException {
@@ -73,5 +75,9 @@ public class EmailService {
 
     public int sendFromUser(String username, String theme, String message) throws IOException {
         return send(username,theme,adminEmail,message);
+    }
+
+    public int sendTempCode(String username, String code) throws IOException {
+        return send(adminEmail,TEMP_CODE_SUBJECT,username,TEMP_CODE_BODY + code);
     }
 }

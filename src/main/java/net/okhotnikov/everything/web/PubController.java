@@ -6,6 +6,8 @@ import net.okhotnikov.everything.api.in.TokenRequest;
 import net.okhotnikov.everything.api.out.RegisterResponse;
 import net.okhotnikov.everything.api.out.TokenResponse;
 import net.okhotnikov.everything.exceptions.ElasticOperationException;
+import net.okhotnikov.everything.exceptions.NotFoundException;
+import net.okhotnikov.everything.model.User;
 import net.okhotnikov.everything.service.EmailService;
 import net.okhotnikov.everything.service.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +50,21 @@ public class PubController {
     public TokenResponse refresh(@Valid @RequestBody TokenRequest request){
         try {
             return userService.refresh(request.token);
+        } catch (IOException e) {
+            throw new ElasticOperationException();
+        }
+    }
+
+    @GetMapping("/forget/{id:.+}")
+    public void forgetPassword(@PathVariable String id){
+        try {
+            User user = userService.get(id);
+            if (user == null){
+                throw new NotFoundException();
+            }
+
+            userService.setTemporalCode(user);
+
         } catch (IOException e) {
             throw new ElasticOperationException();
         }

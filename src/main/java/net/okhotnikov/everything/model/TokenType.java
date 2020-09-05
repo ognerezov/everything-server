@@ -6,5 +6,6 @@ package net.okhotnikov.everything.model;
 public enum TokenType {
     BEARER,
     REFRESH,
-    ACCESS_CODE
+    ACCESS_CODE,
+    TEMP_CODE
 }

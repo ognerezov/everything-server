@@ -18,12 +18,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +33,10 @@ import org.slf4j.Logger;
 
 import static junit.framework.Assert.*;
 import static junit.framework.Assert.assertEquals;
+import static net.okhotnikov.everything.service.ElasticService.USERS;
 import static net.okhotnikov.everything.service.UserServiceTest.TEST_PASSWORD;
 import static net.okhotnikov.everything.service.UserServiceTest.TEST_USER_NAME;
+import static net.okhotnikov.everything.util.Literals.REFRESH_TOKEN;
 import static org.junit.Assert.assertNotEquals;
 
 /**
@@ -67,6 +71,10 @@ public class DevScripts {
 
     @Autowired
     private ElasticDao elasticDao;
+
+    @Value("${reader.username}")
+    private String readerUsername;
+
 
     @Before
     public void  before(){
@@ -136,7 +144,7 @@ public class DevScripts {
 
     @Test
     public void getTestUser() throws IOException {
-        System.out.println(userService.get(TEST_USER_NAME));
+        System.out.println(userService.get(TEST_USER_NAME).refreshToken);
     }
 
     @Test
@@ -197,9 +205,30 @@ public class DevScripts {
     @Test
     public void testDateNumbers() throws IOException {
         System.out.println(DataUtil.getDateNumbers(232));
-   //     System.out.println(freeBookController.getNumberOfTheDay());
         System.out.println(bookController.getNumberOfTheDay());
     }
 
 
+    @Test
+    public void testGetByField() throws IOException {
+        String token = userService.get(TEST_USER_NAME).refreshToken;
+        System.out.println(token);
+        String [] data = token.split("\\.");
+        List<Map<String,Object>> res = elasticDao.getByField(USERS,REFRESH_TOKEN, data[data.length-1],100);
+        System.out.println(res.size());
+        for(Map<String,Object> map : res)
+            System.out.println(map.get(REFRESH_TOKEN));
+
+    }
+
+
+    @Test
+    public void setReaderToken() throws IOException {
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("token","i085a");
+
+        elasticDao.update(USERS,readerUsername,data);
+        System.out.println(userService.getReadersToken());
+    }
 }

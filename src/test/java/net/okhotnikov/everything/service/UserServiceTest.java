@@ -29,6 +29,7 @@ public class UserServiceTest {
 
     public static final String TEST_USER_NAME = "ognerezov@yandex.ru";
     public static final String TEST_PASSWORD = "test";
+    public static final String TEST_PASSWORD_NEW = "123";
     @Autowired
     private UserService userService;
 
@@ -41,6 +42,12 @@ public class UserServiceTest {
     @Test
     public void testCreateUser() throws IOException {
 
+        try{
+            userService.delete(TEST_USER_NAME);
+        }catch (Exception e){
+
+        }
+
         userService.register(TEST_USER_NAME,TEST_PASSWORD);
 
         UserDetails stored = userService.loadUserByUsername(TEST_USER_NAME);
@@ -50,14 +57,15 @@ public class UserServiceTest {
         assertNotNull(stored);
         assertEquals(TEST_USER_NAME,stored.getUsername());
 
-        TokenResponse response = userService.login(TEST_USER_NAME,TEST_PASSWORD);
+        userService.setPassword(TEST_USER_NAME,TEST_PASSWORD_NEW);
+
+        TokenResponse response = userService.login(TEST_USER_NAME,TEST_PASSWORD_NEW);
 
         User auth = userService.auth(response.token);
 
         assertEquals(TEST_USER_NAME,auth.username);
 
         TokenResponse newTokens = userService.refresh(response.refreshToken);
-
 
         auth = userService.auth(newTokens.token);
         assertEquals(TEST_USER_NAME,auth.username);
@@ -102,6 +110,7 @@ public class UserServiceTest {
 
         assertNull(userService.get(TEST_USER_NAME));
     }
+
 
 
 }

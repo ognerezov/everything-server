@@ -50,6 +50,21 @@ public class RedisService {
         update(user,TokenType.BEARER);
     }
 
+    public void temp(User user){
+        UserRecord userRecord = user.toRecord();
+        try {
+            String json = mapper.writeValueAsString(userRecord);
+            dao.putString(
+                    user.token,
+                    json,
+                    tokenService.getTempTtl()*60
+            );
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException();
+        }
+
+    }
+
     public void update(User user, TokenType tokenType) throws JsonProcessingException {
         UserRecord userRecord = user.toRecord();
         String json = mapper.writeValueAsString(userRecord);

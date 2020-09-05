@@ -78,7 +78,8 @@ public class ElasticDao {
     }
 
     public List<Map<String, Object>> getByField(String index, String field, String value, int size) throws IOException {
-        MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(field, value);
+        MatchQueryBuilder matchQueryBuilder = new MatchQueryBuilder(field, value)
+                .prefixLength(value.length());
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
                 .query(matchQueryBuilder)
                 .from(0)

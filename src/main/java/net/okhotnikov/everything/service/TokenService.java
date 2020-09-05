@@ -29,12 +29,19 @@ public class TokenService {
     @Value("${token.refresh.ttl}")
     private int refreshTtl;
 
+    @Value("${token.temp.ttl}")
+    private int tempTtl;
+
     @Value("${reader.token.length}")
     private int readerTokenLength;
 
     public  String getToken(String username, TokenType tokenType){
         if(tokenType == TokenType.ACCESS_CODE){
             return StringUtil.getName(readerTokenLength);
+        }
+
+        if (tokenType == TokenType.TEMP_CODE){
+            return StringUtil.getNumberCode(readerTokenLength);
         }
 
 
@@ -93,5 +100,9 @@ public class TokenService {
 
     public int getReaderTokenLength() {
         return readerTokenLength;
+    }
+
+    public int getTempTtl() {
+        return tempTtl;
     }
 }
