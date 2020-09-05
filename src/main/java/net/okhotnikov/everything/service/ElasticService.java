@@ -19,6 +19,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
 import static net.okhotnikov.everything.util.DataUtil.numberOfTheDay;
+import static net.okhotnikov.everything.util.DataUtil.numbersOfTheDay;
 import static net.okhotnikov.everything.util.Literals.*;
 
 /**
@@ -121,6 +122,13 @@ public class ElasticService {
     public List<Map<String, Object>> getNumberOfTheDay() throws IOException {
 
         return multiGet(numberOfTheDay(countChapters()))
+                .stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    public List<Map<String, Object>> getNumbersOfTheDay() throws IOException {
+        return multiGet(numbersOfTheDay(countChapters()))
                 .stream()
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());

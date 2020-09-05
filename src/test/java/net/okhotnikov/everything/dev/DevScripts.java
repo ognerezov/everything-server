@@ -10,6 +10,7 @@ import net.okhotnikov.everything.service.RedisService;
 import net.okhotnikov.everything.service.TokenService;
 import net.okhotnikov.everything.service.UserService;
 import net.okhotnikov.everything.util.DataUtil;
+import net.okhotnikov.everything.web.BookController;
 import net.okhotnikov.everything.web.FreeBookController;
 import org.elasticsearch.search.sort.SortOrder;
 import org.junit.Before;
@@ -46,6 +47,9 @@ public class DevScripts {
 
     @Autowired
     private FreeBookController freeBookController;
+
+    @Autowired
+    private BookController bookController;
 
     @Autowired
     private EmailService emailService;
@@ -193,6 +197,9 @@ public class DevScripts {
     @Test
     public void testDateNumbers() throws IOException {
         System.out.println(DataUtil.getDateNumbers(232));
-        System.out.println(freeBookController.getNumberOfTheDay());
+   //     System.out.println(freeBookController.getNumberOfTheDay());
+        System.out.println(bookController.getNumberOfTheDay());
     }
+
+
 }

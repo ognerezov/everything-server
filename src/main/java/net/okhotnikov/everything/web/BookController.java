@@ -3,6 +3,7 @@ package net.okhotnikov.everything.web;
 import net.okhotnikov.everything.api.in.ChapterRequest;
 import net.okhotnikov.everything.exceptions.NotFoundException;
 import net.okhotnikov.everything.service.ElasticService;
+import net.okhotnikov.everything.util.DataUtil;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -55,5 +56,10 @@ public class BookController {
     @GetMapping("/search/{text:.+}")
     public List<Map<String, Object>> search(@PathVariable String text) throws IOException {
         return elasticService.getChaptersWithText(text);
+    }
+
+    @GetMapping("/day")
+    public List<Map<String, Object>> getNumberOfTheDay() throws IOException {
+        return  elasticService.getNumbersOfTheDay();
     }
 }

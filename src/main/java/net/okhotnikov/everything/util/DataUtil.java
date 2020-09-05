@@ -2,6 +2,7 @@ package net.okhotnikov.everything.util;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Sergey Okhotnikov.
@@ -73,6 +74,13 @@ public class DataUtil {
 
     public static int getMaxDateNumber(int max){
         return getDateNumbers(max).last();
+    }
+
+    public static Set<String> numbersOfTheDay(int max){
+        return  getDateNumbers(max)
+                .stream()
+                .map(String::valueOf)
+                .collect(Collectors.toSet());
     }
 
     public static TreeSet<Integer> getDateNumbers(int max){
