@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNotEquals;
 import net.okhotnikov.everything.api.out.TokenResponse;
 import net.okhotnikov.everything.dao.RedisDao;
 import net.okhotnikov.everything.model.User;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +112,33 @@ public class UserServiceTest {
         assertNull(userService.get(TEST_USER_NAME));
     }
 
+
+    @Test
+    public void testForgetRestore() throws IOException {
+        try{
+            userService.delete(TEST_USER_NAME);
+        }catch (Exception e){
+
+        }
+
+        userService.register(TEST_USER_NAME,TEST_PASSWORD);
+
+        User user = userService.get(TEST_USER_NAME);
+
+        String code = userService.setTemporalCode(user);
+
+        Integer val = Integer.parseInt(code);
+
+        assertNotNull(val);
+
+
+        TokenResponse tokenResponse = userService.restore(code);
+
+        assertNotNull(tokenResponse);
+        assertEquals(TEST_USER_NAME,tokenResponse.username);
+        assertNotNull(tokenResponse.token);
+        assertNull(tokenResponse.refreshToken);
+    }
 
 
 }

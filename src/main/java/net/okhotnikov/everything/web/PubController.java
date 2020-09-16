@@ -55,6 +55,15 @@ public class PubController {
         }
     }
 
+    @PutMapping("/code")
+    public TokenResponse restore(@Valid @RequestBody TokenRequest request){
+        try {
+            return userService.restore(request.token);
+        } catch (IOException e) {
+            throw new ElasticOperationException();
+        }
+    }
+
     @GetMapping("/forget/{id:.+}")
     public void forgetPassword(@PathVariable String id){
         try {

@@ -192,6 +192,17 @@ public class UserService {
         }
     }
 
+    public TokenResponse restore(String token) throws IOException {
+        User user = auth(token);
+        deletePreviousTokens(user);
+        user.token = tokenService.getToken(user.username, TokenType.BEARER);
+        setTokens(user.username,user.token,user.refreshToken);
+        user.refreshToken = null;
+        redisService.putUser(user);
+        redisService.delete(token);
+        return new TokenResponse(user.token,user.refreshToken, user.username, user.emailStatus,user.roles);
+    }
+
     public List<User> getAfter(LocalDate date) throws IOException {
         return elasticService.getAfter(
                 USERS,
@@ -251,10 +262,11 @@ public class UserService {
         redisService.update(user,TokenType.ACCESS_CODE);
     }
 
-    public void setTemporalCode(User user) throws IOException {
+    public String setTemporalCode(User user) throws IOException {
         user.token = tokenService.getToken(user.username,TokenType.TEMP_CODE);
         redisService.temp(user);
         emailService.sendTempCode(user.username, user.token);
+        return user.token;
     }
 
     public void setPassword(String username, String password) throws IOException {
@@ -264,4 +276,5 @@ public class UserService {
 
         dao.update(USERS,username,data);
     }
+
 }

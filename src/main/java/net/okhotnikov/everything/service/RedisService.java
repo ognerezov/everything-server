@@ -65,6 +65,15 @@ public class RedisService {
 
     }
 
+    public void putUser(User user) throws JsonProcessingException {
+        UserRecord userRecord = user.toRecord();
+        String json = mapper.writeValueAsString(userRecord);
+        dao.putString(
+                user.token,
+                json, tokenService.getTokenTtl()*60
+        );
+    }
+
     public void update(User user, TokenType tokenType) throws JsonProcessingException {
         UserRecord userRecord = user.toRecord();
         String json = mapper.writeValueAsString(userRecord);
@@ -128,5 +137,9 @@ public class RedisService {
             dao.delKey(user.token);
         if(user.refreshToken != null)
             dao.delKey(user.refreshToken);
+    }
+
+    public void delete(String key){
+        dao.delKey(key);
     }
 }
