@@ -178,16 +178,21 @@ public class UserService {
         }catch (NotVerifiedEmailException e){
             String username = auth(token).username;
             User user = get(username);
+            if (user == null)
+                throw new UnauthorizedException(token);
             redisService.revokeTokens(user);
             return redisService.login(user);
         }catch (UnauthorizedException exception){
-            User user = elasticService.getByUniqueField(USERS,REFRESH_TOKEN, token, new TypeReference<User>(){});
-            if (user != null){
-                redisService.revokeTokens(user);
-                System.out.println("Erase tokens for user: "+ user.username);
-                setTokens(user.username,null,null);
-            }
+            try {
+                User user = elasticService.getByUniqueField(USERS, REFRESH_TOKEN, token, new TypeReference<User>() {});
+                if (user != null){
+                    redisService.revokeTokens(user);
+                    System.out.println("Erase tokens for user: "+ user.username);
+                    setTokens(user.username,null,null);
+                }
+            }catch (IndexOutOfBoundsException ignored){
 
+            }
             throw exception;
         }
     }
@@ -196,8 +201,8 @@ public class UserService {
         User user = auth(token);
         deletePreviousTokens(user);
         user.token = tokenService.getToken(user.username, TokenType.BEARER);
+        user.refreshToken = tokenService.getToken(user.username,TokenType.REFRESH);
         setTokens(user.username,user.token,user.refreshToken);
-        user.refreshToken = null;
         redisService.putUser(user);
         redisService.delete(token);
         return new TokenResponse(user.token,user.refreshToken, user.username, user.emailStatus,user.roles);

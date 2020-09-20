@@ -117,6 +117,8 @@ public class DevScripts {
 
     @Test
     public void deleteTestUser() throws IOException {
+        User user = userService.get(TEST_USER_NAME);
+        redisService.delete(user.token);
         userService.delete(TEST_USER_NAME);
 
         assertNull(userService.get(TEST_USER_NAME));
@@ -144,7 +146,7 @@ public class DevScripts {
 
     @Test
     public void getTestUser() throws IOException {
-        System.out.println(userService.get(TEST_USER_NAME).refreshToken);
+        System.out.println(userService.get(TEST_USER_NAME).token);
     }
 
     @Test
@@ -170,8 +172,8 @@ public class DevScripts {
 
     @Test
     public void testAddRole() throws IOException {
-        userService.addRole("sergey@okhotnikov.net", Role.ROLE_READER);
-        User stored = userService.get("sergey@okhotnikov.net");
+        userService.addRole(TEST_USER_NAME, Role.ROLE_READER);
+        User stored = userService.get(TEST_USER_NAME);
 
         assertTrue(stored.roles.contains(Role.ROLE_READER));
     }
