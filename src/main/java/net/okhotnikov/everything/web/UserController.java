@@ -5,7 +5,9 @@ import net.okhotnikov.everything.api.in.TokenRequest;
 import net.okhotnikov.everything.exceptions.ElasticOperationException;
 import net.okhotnikov.everything.exceptions.UnauthorizedException;
 import net.okhotnikov.everything.service.EmailService;
+import net.okhotnikov.everything.service.PaymentService;
 import net.okhotnikov.everything.service.UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -25,10 +27,12 @@ public class UserController {
 
     private final EmailService emailService;
     private final UserService userService;
+    private final PaymentService paymentService;
 
-    public UserController(EmailService emailService, UserService userService) {
+    public UserController(EmailService emailService, UserService userService, PaymentService paymentService) {
         this.emailService = emailService;
         this.userService = userService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping("/message")
@@ -40,6 +44,15 @@ public class UserController {
     public void setPassword(@Valid @RequestBody TokenRequest request){
         try {
             userService.setPassword(getUsernameFromContext(),request.token);
+        } catch (IOException e) {
+            throw  new ElasticOperationException();
+        }
+    }
+
+    @PostMapping
+    public void purchase(@Valid @RequestBody TokenRequest request){
+        try {
+            paymentService.appStorePurchase(getUsernameFromContext(),request.token);
         } catch (IOException e) {
             throw  new ElasticOperationException();
         }

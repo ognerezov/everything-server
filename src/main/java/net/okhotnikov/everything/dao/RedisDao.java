@@ -1,6 +1,5 @@
 package net.okhotnikov.everything.dao;
 
-import net.okhotnikov.everything.service.TokenService;
 import org.springframework.stereotype.Repository;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
