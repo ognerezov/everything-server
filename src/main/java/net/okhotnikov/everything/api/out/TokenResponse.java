@@ -1,6 +1,7 @@
 package net.okhotnikov.everything.api.out;
 
 import net.okhotnikov.everything.model.Role;
+import net.okhotnikov.everything.model.User;
 
 import java.util.Set;
 
@@ -23,6 +24,10 @@ public class TokenResponse {
         this.username = username;
         this.emailStatus = emailStatus;
         this.roles = roles;
+    }
+
+    public TokenResponse(User user) {
+        this(user.token,user.refreshToken,user.username,user.emailStatus,user.roles);
     }
 
     public String getToken() {

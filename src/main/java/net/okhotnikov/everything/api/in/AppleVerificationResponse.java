@@ -21,4 +21,13 @@ public class AppleVerificationResponse extends StatusResponse {
     public void setEnvironment(String environment) {
         this.environment = environment;
     }
+
+    @Override
+    public String toString() {
+        return "AppleVerificationResponse{" +
+                "receipt=" + receipt +
+                ", environment='" + environment + '\'' +
+                ", status=" + status +
+                '}';
+    }
 }

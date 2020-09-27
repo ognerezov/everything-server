@@ -237,7 +237,7 @@ public class UserService {
         return tokenResponse.token;
     }
 
-    public void addRole(String username, Role role) throws IOException {
+    public User addRole(String username, Role role) throws IOException {
         User user = get(username);
         if(user == null)
             throw new NotFoundException();
@@ -246,6 +246,8 @@ public class UserService {
         data.put(ROLES,user.roles);
         dao.update(USERS,username,data);
         redisService.update(user);
+
+        return user;
     }
 
     public String getReadersToken() throws IOException {

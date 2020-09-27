@@ -2,6 +2,7 @@ package net.okhotnikov.everything.web;
 
 import net.okhotnikov.everything.api.in.SupportRequest;
 import net.okhotnikov.everything.api.in.TokenRequest;
+import net.okhotnikov.everything.api.out.TokenResponse;
 import net.okhotnikov.everything.exceptions.ElasticOperationException;
 import net.okhotnikov.everything.exceptions.UnauthorizedException;
 import net.okhotnikov.everything.service.EmailService;
@@ -49,10 +50,10 @@ public class UserController {
         }
     }
 
-    @PostMapping
-    public void purchase(@Valid @RequestBody TokenRequest request){
+    @PostMapping("/apple")
+    public TokenResponse purchaseAppStore(@Valid @RequestBody TokenRequest request){
         try {
-            paymentService.appStorePurchase(getUsernameFromContext(),request.token);
+           return paymentService.appStorePurchase(getUsernameFromContext(),request.token);
         } catch (IOException e) {
             throw  new ElasticOperationException();
         }

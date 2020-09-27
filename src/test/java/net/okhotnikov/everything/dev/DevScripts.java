@@ -146,7 +146,7 @@ public class DevScripts {
 
     @Test
     public void getTestUser() throws IOException {
-        System.out.println(userService.get(TEST_USER_NAME).token);
+        System.out.println(userService.get(TEST_USER_NAME));
     }
 
     @Test
