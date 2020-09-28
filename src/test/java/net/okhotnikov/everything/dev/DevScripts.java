@@ -179,6 +179,14 @@ public class DevScripts {
     }
 
     @Test
+    public void testRemoveRole() throws IOException {
+        userService.removeRole(TEST_USER_NAME, Role.ROLE_READER);
+        User stored = userService.get(TEST_USER_NAME);
+
+        assertFalse(stored.roles.contains(Role.ROLE_READER));
+    }
+
+    @Test
     public void getUserByToken(){
         System.out.println(redisService.auth("eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJldmVyeXRoaW5nIiwiY2xpZW50VHlwZSI6InVzZXIiLCJleHAiOjE1OTM4Njc1NTUsInVzZXJuYW1lIjoib2duZXJlem92QHlhbmRleC5ydSIsInRva2VuX2NyZWF0ZV9kYXRlIjoxNTkxNDQ4MzU1MjUwfQ.q4iuiCQEgL4itGus7LniG6eIvxzj7SOQ0x_qhsT50PbPfJbfgWSnQv00HpFXZWfzHIVHB6J2G3vnEhA3ySATQg"));
     }

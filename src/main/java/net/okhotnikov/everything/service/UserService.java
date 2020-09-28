@@ -242,13 +242,28 @@ public class UserService {
         if(user == null)
             throw new NotFoundException();
         user.roles.add(role);
-        Map<String, Object> data = new HashMap<>();
-        data.put(ROLES,user.roles);
-        dao.update(USERS,username,data);
-        redisService.update(user);
+        storeUserRoles(username, user);
 
         return user;
     }
+
+    public User removeRole(String username, Role role) throws  IOException{
+        User user = get(username);
+        if(user == null)
+            throw new NotFoundException();
+        user.roles.remove(role);
+        storeUserRoles(username, user);
+        return user;
+    }
+
+    private void storeUserRoles(String username, User user) throws IOException {
+        Map<String, Object> data = new HashMap<>();
+        data.put(ROLES, user.roles);
+        dao.update(USERS, username, data);
+        redisService.update(user);
+    }
+
+
 
     public String getReadersToken() throws IOException {
         User user = get(readerUsername);
