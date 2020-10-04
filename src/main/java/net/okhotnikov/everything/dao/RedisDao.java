@@ -40,4 +40,11 @@ public class RedisDao {
         }
     }
 
+    public void putString(String key, String value) {
+        try (Jedis jedis = pool.getResource()) {
+            jedis.set(key, value);
+        } catch (Exception e){
+            throw e;
+        }
+    }
 }

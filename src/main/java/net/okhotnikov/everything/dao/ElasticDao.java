@@ -100,12 +100,14 @@ public class ElasticDao {
         return getAfter(index,field,value,matchQueryBuilder);
     }
 
-    public List<Map<String, Object>> getAfter(String index, String field, String value, AbstractQueryBuilder queryBuilder) throws IOException {
+    public List<Map<String, Object>> getAfter(String index, String field, String value, QueryBuilder queryBuilder) throws IOException {
         RangeQueryBuilder rangeQueryBuilder = new RangeQueryBuilder(field).gt(value).format(DATE_FORMAT);
 
+        BoolQueryBuilder query = QueryBuilders.boolQuery()
+                .filter(rangeQueryBuilder)
+                .filter(queryBuilder);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
-                .query(rangeQueryBuilder)
-                .query(queryBuilder)
+                .query(query)
                 .from(0)
                 //TODO fix size it could be a lot of users
                 .size(10000);

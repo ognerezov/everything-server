@@ -34,8 +34,7 @@ import org.slf4j.Logger;
 import static junit.framework.Assert.*;
 import static junit.framework.Assert.assertEquals;
 import static net.okhotnikov.everything.service.ElasticService.USERS;
-import static net.okhotnikov.everything.service.UserServiceTest.TEST_PASSWORD;
-import static net.okhotnikov.everything.service.UserServiceTest.TEST_USER_NAME;
+import static net.okhotnikov.everything.service.UserServiceTest.*;
 import static net.okhotnikov.everything.util.Literals.REFRESH_TOKEN;
 import static org.junit.Assert.assertNotEquals;
 
@@ -118,9 +117,9 @@ public class DevScripts {
     @Test
     public void deleteTestUser() throws IOException {
         User user = userService.get(TEST_USER_NAME);
+        System.out.println(user.token);
         redisService.delete(user.token);
         userService.delete(TEST_USER_NAME);
-
         assertNull(userService.get(TEST_USER_NAME));
     }
 
@@ -146,7 +145,7 @@ public class DevScripts {
 
     @Test
     public void getTestUser() throws IOException {
-        System.out.println(userService.get(TEST_USER_NAME));
+        System.out.println(userService.get(TEST_USER_NAME_2));
     }
 
     @Test
@@ -166,7 +165,8 @@ public class DevScripts {
         LocalDate date = LocalDate.now().minus(1,ChronoUnit.YEARS);
 
         List<User> res = userService.getAfter(date);
-        System.out.println(res);
+        for (User user: res)
+            System.out.printf("User: %s, registered: %s, status: %s%n",user.username, user.registered, user.emailStatus);
         System.out.println(res.size());
     }
 

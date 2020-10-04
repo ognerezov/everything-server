@@ -37,7 +37,7 @@ public class TokenService {
 
     public  String getToken(String username, TokenType tokenType){
         if(tokenType == TokenType.ACCESS_CODE){
-            return StringUtil.getName(readerTokenLength);
+            return StringUtil.getNumberCode(readerTokenLength);
         }
 
         if (tokenType == TokenType.TEMP_CODE){

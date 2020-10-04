@@ -29,6 +29,7 @@ import java.util.List;
 public class UserServiceTest {
 
     public static final String TEST_USER_NAME = "ognerezov@yandex.ru";
+    public static final String TEST_USER_NAME_2 = "ognerezov@naumag.com";
     public static final String TEST_PASSWORD = "test";
     public static final String TEST_PASSWORD_NEW = "123";
     @Autowired

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import net.okhotnikov.everything.api.out.RegisterResponse;
 import net.okhotnikov.everything.api.out.TokenResponse;
+import net.okhotnikov.everything.config.authentication.TokenAuthentication;
 import net.okhotnikov.everything.dao.ElasticDao;
 import net.okhotnikov.everything.dao.RedisDao;
 import net.okhotnikov.everything.exceptions.DuplicatedKeyException;
@@ -16,6 +17,7 @@ import net.okhotnikov.everything.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -139,11 +141,19 @@ public class UserService {
         if(user == null || ! passwordEncoder.matches(password,user.password))
             throw new UnauthorizedException(username);
 
+        return acceptLogin(user, tokenType);
+    }
+
+    private TokenResponse acceptLogin(User user, TokenType tokenType) throws IOException {
         deletePreviousTokens(user);
         TokenResponse response = redisService.login(user, tokenType);
-        setTokens(username, response.token, response.refreshToken);
+        setTokens(user.username, response.token, response.refreshToken);
 
         return response;
+    }
+
+    public TokenResponse acceptLogin(User user) throws IOException {
+        return acceptLogin(user, TokenType.BEARER);
     }
 
     private void deletePreviousTokens(User user) {
@@ -243,7 +253,7 @@ public class UserService {
             throw new NotFoundException();
         user.roles.add(role);
         storeUserRoles(username, user);
-
+        LOG.info(String.format("User %s now has role %s", username, role.getAuthority()));
         return user;
     }
 
@@ -261,9 +271,8 @@ public class UserService {
         data.put(ROLES, user.roles);
         dao.update(USERS, username, data);
         redisService.update(user);
+        SecurityContextHolder.getContext().setAuthentication(new TokenAuthentication(user,user.token));
     }
-
-
 
     public String getReadersToken() throws IOException {
         User user = get(readerUsername);

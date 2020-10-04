@@ -142,4 +142,12 @@ public class RedisService {
     public void delete(String key){
         dao.delKey(key);
     }
+
+    public String get(String key) {
+        return dao.getString(key);
+    }
+
+    public void put(String key, String value) {
+        dao.putString(key,value);
+    }
 }

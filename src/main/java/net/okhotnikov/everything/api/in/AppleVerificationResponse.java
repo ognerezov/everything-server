@@ -1,5 +1,6 @@
 package net.okhotnikov.everything.api.in;
 
+import java.util.List;
 import java.util.Map;
 
 public class AppleVerificationResponse extends StatusResponse {
@@ -20,6 +21,14 @@ public class AppleVerificationResponse extends StatusResponse {
 
     public void setEnvironment(String environment) {
         this.environment = environment;
+    }
+
+    public String transactionId(){
+        String res = null;
+
+        List<Map<String, Object>> inApp = (List<Map<String,Object>>)receipt.get("in_app");
+        res = (String) inApp.get(0).get("original_transaction_id");
+        return res;
     }
 
     @Override
