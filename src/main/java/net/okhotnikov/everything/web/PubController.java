@@ -1,8 +1,8 @@
 package net.okhotnikov.everything.web;
 
 import net.okhotnikov.everything.api.in.RegisterRequest;
-import net.okhotnikov.everything.api.in.SupportRequest;
 import net.okhotnikov.everything.api.in.TokenRequest;
+import net.okhotnikov.everything.api.in.UserMessage;
 import net.okhotnikov.everything.api.out.RegisterResponse;
 import net.okhotnikov.everything.api.out.TokenResponse;
 import net.okhotnikov.everything.exceptions.ElasticOperationException;
@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.io.IOException;
 
+import static net.okhotnikov.everything.EverythingApplication.getCurrentUser;
+import static net.okhotnikov.everything.util.Literals.SUPPORT_EMAILS_THEME_PREFIX;
+
 /**
  * Created by Sergey Okhotnikov.
  */
@@ -23,9 +26,11 @@ import java.io.IOException;
 public class PubController {
 
     private final UserService userService;
+    private final EmailService emailService;
 
-    public PubController(UserService userService) {
+    public PubController(UserService userService, EmailService emailService) {
         this.userService = userService;
+        this.emailService = emailService;
     }
 
     @PostMapping("/register")
@@ -74,6 +79,15 @@ public class PubController {
 
             userService.setTemporalCode(user);
 
+        } catch (IOException e) {
+            throw new ElasticOperationException();
+        }
+    }
+
+    @PostMapping("/contact")
+    public void contact(@Valid @RequestBody UserMessage userMessage){
+        try {
+            emailService.sendFromUser(userMessage.email,SUPPORT_EMAILS_THEME_PREFIX ,userMessage.message);
         } catch (IOException e) {
             throw new ElasticOperationException();
         }
