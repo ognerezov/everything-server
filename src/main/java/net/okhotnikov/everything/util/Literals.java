@@ -17,6 +17,7 @@ public interface Literals {
     String EMAIL_STATUS_PROCESSED = "processed";
     String EMAIL_STATUS_BOUNCE = "bounce";
     String EMAIL_STATUS_DEFERRED = "deferred";
+    String DEFAULT_APP = "iOS";
 
     String SUPPORT_EMAILS_THEME_PREFIX = "Sent from everything ";
 }

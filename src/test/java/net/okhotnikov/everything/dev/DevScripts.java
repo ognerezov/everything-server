@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.IOException;
@@ -35,7 +36,7 @@ import static junit.framework.Assert.*;
 import static junit.framework.Assert.assertEquals;
 import static net.okhotnikov.everything.service.ElasticService.USERS;
 import static net.okhotnikov.everything.service.UserServiceTest.*;
-import static net.okhotnikov.everything.util.Literals.REFRESH_TOKEN;
+import static net.okhotnikov.everything.util.Literals.*;
 import static org.junit.Assert.assertNotEquals;
 
 /**
@@ -43,10 +44,10 @@ import static org.junit.Assert.assertNotEquals;
  */
 @SpringBootTest
 @RunWith(SpringRunner.class)
+@ActiveProfiles("test")
 public class DevScripts {
 
     private final Logger LOG = LoggerFactory.getLogger(DevScripts.class);
-
 
     @Autowired
     private FreeBookController freeBookController;
@@ -137,15 +138,18 @@ public class DevScripts {
 
     @Test
     public void registerTestUser() throws IOException {
-
-        userService.register(TEST_USER_NAME,TEST_PASSWORD);
-
+        userService.register(TEST_USER_NAME,TEST_PASSWORD, DEFAULT_APP);
         getTestUser();
     }
 
     @Test
     public void getTestUser() throws IOException {
-        System.out.println(userService.get(TEST_USER_NAME_2));
+        System.out.println(userService.get(TEST_USER_NAME));
+    }
+
+    @Test
+    public void setTestUserStatus() throws IOException {
+        userService.setEmailStatus(TEST_USER_NAME,EMAIL_STATUS_DELIVERED,null);
     }
 
     @Test
@@ -162,7 +166,7 @@ public class DevScripts {
 
     @Test
     public void getUsersAfter() throws IOException {
-        LocalDate date = LocalDate.now().minus(1,ChronoUnit.YEARS);
+        LocalDate date = LocalDate.now().minus(7,ChronoUnit.DAYS);
 
         List<User> res = userService.getAfter(date);
         for (User user: res)
@@ -174,6 +178,14 @@ public class DevScripts {
     public void testAddRole() throws IOException {
         userService.addRole(TEST_USER_NAME, Role.ROLE_READER);
         User stored = userService.get(TEST_USER_NAME);
+
+        assertTrue(stored.roles.contains(Role.ROLE_READER));
+    }
+
+    @Test
+    public void testAppStoreUser() throws IOException {
+        userService.addRole("ognerezov@naumag.com", Role.ROLE_READER);
+        User stored = userService.get("ognerezov@naumag.com");
 
         assertTrue(stored.roles.contains(Role.ROLE_READER));
     }

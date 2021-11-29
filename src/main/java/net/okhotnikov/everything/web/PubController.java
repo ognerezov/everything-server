@@ -36,7 +36,7 @@ public class PubController {
     @PostMapping("/register")
     public RegisterResponse register(@Valid @RequestBody RegisterRequest registerRequest){
         try {
-            return userService.register(registerRequest.username,registerRequest.password);
+            return userService.register(registerRequest.username,registerRequest.password, registerRequest.app);
         } catch (IOException e) {
             throw new ElasticOperationException();
         }

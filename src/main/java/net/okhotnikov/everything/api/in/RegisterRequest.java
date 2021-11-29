@@ -12,6 +12,8 @@ public class RegisterRequest {
     @NotNull
     public String password;
 
+    public String app;
+
     public String getUsername() {
         return username;
     }
@@ -26,5 +28,13 @@ public class RegisterRequest {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getApp() {
+        return app;
+    }
+
+    public void setApp(String app) {
+        this.app = app;
     }
 }

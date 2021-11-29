@@ -6,7 +6,6 @@ import net.okhotnikov.everything.api.out.RegisterResponse;
 import net.okhotnikov.everything.api.out.TokenResponse;
 import net.okhotnikov.everything.config.authentication.TokenAuthentication;
 import net.okhotnikov.everything.dao.ElasticDao;
-import net.okhotnikov.everything.dao.RedisDao;
 import net.okhotnikov.everything.exceptions.DuplicatedKeyException;
 import net.okhotnikov.everything.exceptions.NotFoundException;
 import net.okhotnikov.everything.exceptions.UnauthorizedException;
@@ -14,6 +13,7 @@ import net.okhotnikov.everything.exceptions.service.NotVerifiedEmailException;
 import net.okhotnikov.everything.model.Role;
 import net.okhotnikov.everything.model.TokenType;
 import net.okhotnikov.everything.model.User;
+import net.okhotnikov.everything.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,13 +23,19 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.validation.constraints.Email;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
 import static net.okhotnikov.everything.util.Literals.*;
 import static net.okhotnikov.everything.service.ElasticService.*;
 
@@ -49,6 +55,7 @@ public class UserService {
     private final EmailService emailService;
     private static final Logger LOG = LoggerFactory.getLogger(UserService.class);
     private final TokenService tokenService;
+    private final ScheduledThreadPoolExecutor scheduler;
 
     @Value("${reader.password}")
     private String readerPassword;
@@ -60,7 +67,7 @@ public class UserService {
     private int trialPeriod;
 
 
-    public UserService(ElasticService elasticService, ElasticDao dao, ObjectMapper mapper, PasswordEncoder passwordEncoder, RedisService redisService, EmailService emailService, TokenService tokenService) {
+    public UserService(ElasticService elasticService, ElasticDao dao, ObjectMapper mapper, PasswordEncoder passwordEncoder, RedisService redisService, EmailService emailService, TokenService tokenService, ScheduledThreadPoolExecutor scheduler) {
         this.elasticService = elasticService;
         this.dao = dao;
         this.mapper = mapper;
@@ -68,6 +75,7 @@ public class UserService {
         this.redisService = redisService;
         this.emailService = emailService;
         this.tokenService = tokenService;
+        this.scheduler = scheduler;
     }
 
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
@@ -83,13 +91,14 @@ public class UserService {
     }
 
 
-    public RegisterResponse register(@Email String username, String password) throws IOException {
+    public RegisterResponse register(@Email String username, String password, String app) throws IOException {
         User user = new User(
                 username,
                 password,
                 User.getUserRoles(),
                 true,
-                EMAIL_SENT_STATUS
+                EMAIL_SENT_STATUS,
+                StringUtil.isEmpty(app) ? DEFAULT_APP : app
         );
         TokenResponse response = redisService.login(user, TokenType.BEARER);
         String readersToken = getReadersToken();
@@ -103,7 +112,6 @@ public class UserService {
 
         } catch (Exception e){
             deletePreviousTokens(user);
-
             throw e;
         }
 
@@ -178,6 +186,14 @@ public class UserService {
         dao.update(USERS,username,data);
     }
 
+    public void updateReadersRegistration() throws IOException {
+        Map<String, Object> data = new HashMap<>();
+
+        data.put(REGISTERED,DATE_FORMATTER.format(LocalDate.now()));
+
+        dao.update(USERS,readerUsername,data);
+    }
+
     public User auth(String token){
         return redisService.auth(token);
     }
@@ -233,13 +249,18 @@ public class UserService {
     public String updateReader() throws IOException{
         TokenResponse tokenResponse = loginReader();
         LocalDate date = LocalDate.now();
+        scheduler.schedule(this::updateReader,trialPeriod, TimeUnit.DAYS);
+        LocalDateTime nextUpdate = LocalDateTime.now().plus(trialPeriod, ChronoUnit.DAYS);
+        setUpdate(readerUsername,nextUpdate);
+        LOG.warn("Schedule new reader update on " +nextUpdate);
 
         List<User> res = getAfter(date.minus(trialPeriod, ChronoUnit.DAYS));
+
+        LOG.warn(String.format("Found %d users on a trial. Sending emails.",res.size()));
         for(User user: res){
             try {
 
                 emailService.sendRenew(user.username,tokenResponse.token);
-
             }catch (Exception e){
                 LOG.error((user == null? "null" : user.username) +" -> "+e.getClass().getSimpleName());
             }
@@ -306,6 +327,37 @@ public class UserService {
         data.put("password",passwordEncoder.encode(password));
 
         dao.update(USERS,username,data);
+    }
+
+
+    public void setUpdate(String username, LocalDateTime date) throws IOException {
+        Map<String, Object> data = new HashMap<>();
+
+        data.put("updated",date);
+        dao.update(USERS,username,data);
+    }
+
+    @PostConstruct
+    public void checkReaderUpdate() throws IOException {
+        LOG.info("Checking reader update on startup");
+        User user = get(readerUsername);
+        if(user.updated == null){
+            LOG.warn("Reader has not initial update");
+            updateReader();
+            return;
+        }
+
+        long delay = user.updated.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() -
+                LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+        if (delay <= 0){
+            LOG.error("Reader update is overdue");
+            updateReader();
+            return;
+        }
+
+        LOG.info(String.format("Scheduling next update in %d minutes",delay/60000));
+        scheduler.schedule(this::updateReader,delay, TimeUnit.MILLISECONDS);
     }
 
 }

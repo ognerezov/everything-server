@@ -12,15 +12,17 @@ public class UserRecord {
     public String token;
     public boolean enabled;
     public String emailStatus;
+    public String app;
 
     public UserRecord() {
     }
 
-    public UserRecord(String username, Set<Role> roles, boolean enabled, String emailStatus) {
+    public UserRecord(String username, Set<Role> roles, boolean enabled, String emailStatus, String app) {
         this.username = username;
         this.roles = roles;
         this.enabled = enabled;
         this.emailStatus = emailStatus;
+        this.app = app;
     }
 
     public void setRoles(Set<Role> roles) {
@@ -67,6 +69,14 @@ public class UserRecord {
 
     public void setEmailStatus(String emailStatus) {
         this.emailStatus = emailStatus;
+    }
+
+    public String getApp() {
+        return app;
+    }
+
+    public void setApp(String app) {
+        this.app = app;
     }
 
     @Override

@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -21,20 +22,22 @@ public class User extends UserRecord implements UserDetails {
     public String refreshToken;
     public LocalDate registered = LocalDate.now();
     public String reason;
+    public LocalDateTime updated;
 
     public User() {
     }
 
-    public User(String username, String password, Set<Role> roles, boolean enabled, String status) {
+    public User(String username, String password, Set<Role> roles, boolean enabled, String status, String app) {
         this.username = username;
         this.password = password;
         this.roles = roles;
         this.enabled = enabled;
         this.emailStatus = status;
+        this.app = app;
     }
 
     public User(User user) {
-        this(user.username,user.password, new HashSet<>(user.roles),user.enabled,user.emailStatus);
+        this(user.username,user.password, new HashSet<>(user.roles),user.enabled,user.emailStatus, user.app);
         this.token = user.token;
         this.refreshToken = user.token;
         this.registered = user.registered;
@@ -47,7 +50,7 @@ public class User extends UserRecord implements UserDetails {
     }
 
     public UserRecord toRecord(){
-        return new UserRecord(username,roles, enabled, emailStatus);
+        return new UserRecord(username,roles, enabled, emailStatus, app);
     }
 
     public void setPassword(String password) {
@@ -62,6 +65,13 @@ public class User extends UserRecord implements UserDetails {
         this.refreshToken = refreshToken;
     }
 
+    public LocalDateTime getUpdated() {
+        return updated;
+    }
+
+    public void setUpdated(LocalDateTime updated) {
+        this.updated = updated;
+    }
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = DATE_FORMAT)
     public LocalDate getRegistered() {
@@ -117,11 +127,13 @@ public class User extends UserRecord implements UserDetails {
                 ", refreshToken='" + refreshToken + '\'' +
                 ", registered=" + registered +
                 ", reason='" + reason + '\'' +
+                ", updated=" + updated +
                 ", username='" + username + '\'' +
                 ", roles=" + roles +
                 ", token='" + token + '\'' +
                 ", enabled=" + enabled +
                 ", emailStatus='" + emailStatus + '\'' +
+                ", app='" + app + '\'' +
                 "} " + super.toString();
     }
 }

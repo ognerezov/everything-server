@@ -21,7 +21,7 @@ public class DataUtil {
         while (it.hasNext()){
             Map<String,Object> record = it.next();
             String type = (String)record.get(TYPE);
-            if(QUOTATION.equals(type) || POEM.equals(type) || CHAPTER.equals(type))
+            if(QUOTATION.equals(type) || CHAPTER.equals(type))
                 continue;
 
             it.remove();

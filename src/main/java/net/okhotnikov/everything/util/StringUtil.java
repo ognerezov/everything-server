@@ -21,4 +21,8 @@ public class StringUtil {
     public static String getNumberCode(int length){
         return getName().replaceAll("\\D","").substring(0,length);
     }
+
+    public static boolean isEmpty(String s){
+        return s == null || s.isEmpty();
+    }
 }
