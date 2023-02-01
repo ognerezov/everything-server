@@ -5,10 +5,7 @@ import net.okhotnikov.everything.dao.ElasticDao;
 import net.okhotnikov.everything.dao.RedisDao;
 import net.okhotnikov.everything.model.Role;
 import net.okhotnikov.everything.model.User;
-import net.okhotnikov.everything.service.EmailService;
-import net.okhotnikov.everything.service.RedisService;
-import net.okhotnikov.everything.service.TokenService;
-import net.okhotnikov.everything.service.UserService;
+import net.okhotnikov.everything.service.*;
 import net.okhotnikov.everything.util.DataUtil;
 import net.okhotnikov.everything.web.BookController;
 import net.okhotnikov.everything.web.FreeBookController;
@@ -23,7 +20,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
@@ -74,6 +74,9 @@ public class DevScripts {
 
     @Value("${reader.username}")
     private String readerUsername;
+
+    @Autowired
+    private ElasticService elasticService;
 
 
     @Before
@@ -252,5 +255,24 @@ public class DevScripts {
 
         elasticDao.update(USERS,readerUsername,data);
         System.out.println(userService.getReadersToken());
+    }
+
+    @Test
+    public void testAll()throws IOException{
+        List<Map<String,Object>> all = elasticService.getAll();
+
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                Files.newOutputStream(Paths.get("./sitemap.xml")), StandardCharsets.UTF_8))) {
+            writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                    "   <urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:image=\"http://www.google.com/schemas/sitemap-image/1.1\">\n");
+
+            for(Map<String,Object> doc: all){
+                writer.write(String.format("     <url>\n" +
+                        "       <loc>https://everything-from.one/%s</loc>\n" +
+                        "     </url>\n",doc.get("number")));
+            }
+
+            writer.write("</urlset>");
+        }
     }
 }

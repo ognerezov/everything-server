@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static net.okhotnikov.everything.util.DataUtil.numberOfTheDay;
 import static net.okhotnikov.everything.util.DataUtil.numbersOfTheDay;
@@ -40,10 +41,13 @@ public class ElasticService {
     private final ElasticDao dao;
     private final ObjectMapper mapper;
 
+    private final int max;
 
-    public ElasticService(ElasticDao dao, ObjectMapper mapper) {
+
+    public ElasticService(ElasticDao dao, ObjectMapper mapper, @Value("${app.max}") int max) {
         this.dao = dao;
         this.mapper = mapper;
+        this.max = max;
     }
 
     public Map<String, Object> get(String id) throws IOException {
@@ -110,6 +114,10 @@ public class ElasticService {
                 .stream(response.getHits().getHits())
                 .map(SearchHit::getSourceAsMap)
                 .collect(Collectors.toList());
+    }
+
+    public List<Map<String, Object>> getAll() throws IOException {
+        return multiGet(IntStream.rangeClosed(1, max).mapToObj(String::valueOf).collect(Collectors.toSet()));
     }
 
     public List<Map<String, Object>> getChaptersWithText(String text) throws IOException {

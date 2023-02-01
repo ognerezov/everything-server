@@ -31,7 +31,7 @@ public class RedisDao {
         return res;
     }
 
-    public void putString(String token, String s,int ttl){
+    public void putString(String token, String s,long ttl){
         try (Jedis jedis = pool.getResource()) {
             String res=jedis.setex(token,
                     ttl,s);

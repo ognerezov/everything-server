@@ -291,6 +291,8 @@ public class UserService {
         Map<String, Object> data = new HashMap<>();
         data.put(ROLES, user.roles);
         dao.update(USERS, username, data);
+        if(user.token == null)
+            return;
         redisService.update(user);
         SecurityContextHolder.getContext().setAuthentication(new TokenAuthentication(user,user.token));
     }

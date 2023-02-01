@@ -43,7 +43,7 @@ public class EmailService {
     public int send(String fromAddress, String subject, String toAddress, String body) throws IOException {
         Email from = new Email(fromAddress);
         Email to = new Email(toAddress);
-        Content content = new Content("text/plain", body);
+        Content content = new Content("text/html", body);
 
         Mail mail = new Mail(from, subject, to, content);
 
