@@ -29,6 +29,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 
@@ -258,18 +259,21 @@ public class DevScripts {
     }
 
     @Test
-    public void testAll()throws IOException{
-        List<Map<String,Object>> all = elasticService.getAll();
+    public void testSiteMap()throws IOException{
 
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(
                 Files.newOutputStream(Paths.get("./sitemap.xml")), StandardCharsets.UTF_8))) {
             writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                    "   <urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:image=\"http://www.google.com/schemas/sitemap-image/1.1\">\n");
+                    "   <urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\" xmlns:image=\"http://www.google.com/schemas/sitemap-image/1.1\">\n" +
+                    "     <url>\n" +
+                    "       <loc>https://everything-from.one</loc>\n" +
+                    "     </url>\n");
 
-            for(Map<String,Object> doc: all){
-                writer.write(String.format("     <url>\n" +
+            for(int i=1; i<=465; i++){
+                writer.write(String.format(
+                        "     <url>\n" +
                         "       <loc>https://everything-from.one/%s</loc>\n" +
-                        "     </url>\n",doc.get("number")));
+                        "     </url>\n",i));
             }
 
             writer.write("</urlset>");
